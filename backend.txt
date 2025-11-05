@@ -1,0 +1,59 @@
+Controllers / UsersController.cs.
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace ApiService.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class UsersController : ControllerBase
+    {
+        private readonly AppDbContext _context;
+
+        public UsersController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        // 👇 Сюди ми додамо метод DeleteUser
+    }
+}
+
+DeleteUser
+[HttpDelete("{id}")]
+public async Task<IActionResult> DeleteUser(int id, [FromQuery] string userCode)
+{
+    // 1 Перевірка, чи є користувач із заданим userCode
+    var adminUser = await _context.Users.FirstOrDefaultAsync(u => u.UserCode == userCode);
+    if (adminUser == null)
+        return NotFound("User with provided userCode not found.");
+
+    // 2 Перевірка, що користувач — адміністратор
+    if (!adminUser.IsAdmin)
+        return Forbid("Only admin can remove participants.");
+
+    // 3 Пошук користувача, якого потрібно видалити
+    var userToDelete = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+    if (userToDelete == null)
+        return NotFound("User with provided id not found.");
+
+    // 4 Перевірка, що вони з однієї кімнати
+    if (userToDelete.RoomId != adminUser.RoomId)
+        return BadRequest("Users belong to different rooms.");
+
+    // 5 Адміністратор не може видалити себе
+    if (userToDelete.Id == adminUser.Id)
+        return BadRequest("Admin cannot remove themselves.");
+
+    // 6 Перевірка, чи кімната відкрита
+    var room = await _context.Rooms.FirstOrDefaultAsync(r => r.Id == adminUser.RoomId);
+    if (room == null || room.IsClosed)
+        return BadRequest("Room is already closed.");
+
+    // 7 Видалення користувача
+    _context.Users.Remove(userToDelete);
+    await _context.SaveChangesAsync();
+
+    // 8 Відповідь успіху
+    return Ok($"User {userToDelete.FirstName} {userToDelete.LastName} removed successfully.");
+}
