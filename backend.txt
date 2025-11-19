@@ -15,7 +15,7 @@ namespace ApiService.Controllers
             _context = context;
         }
 
-        // 👇 Сюди ми додамо метод DeleteUser
+        // Додамо метод DeleteUser
     }
 }
 
