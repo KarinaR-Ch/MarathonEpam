@@ -2142,6 +2142,8 @@ const playersList = [
 // Variables for delete confirmation modal 
 let currentDeletePlayerRow = null; 
 let currentDeletePlayerName = ''; 
+// Global variable to track admin status 
+let isAdmin = false; 
 // Function to show Look Who You Got card after 5 seconds 
 function showLookWhoCard() { 
 setTimeout(function() { 
@@ -2199,6 +2201,7 @@ const adminPassword = document.getElementById('admin-password').value;
 const adminPasswordError = document.getElementById('admin-password-error'); 
 if (adminPassword === '1111') { 
 // Password is correct - navigate to participant page as admin 
+isAdmin = true; 
 transferDataToParticipantPage(); 
 navigateToParticipantPageAsAdmin(); 
 } else { 
@@ -2273,6 +2276,10 @@ history.pushState(null, null, '#participant');
 showLookWhoCard(); 
 // Ensure Draw Names card is hidden for regular user 
 document.getElementById('draw-names-card').style.display = 'none'; 
+// Hide delete buttons for regular user 
+document.querySelectorAll('.admin-only').forEach(btn => { 
+btn.style.display = 'none'; 
+}); 
 } 
 // Draw Names button handler 
 document.getElementById('draw-names-btn').addEventListener('click', function() { 
@@ -2287,7 +2294,7 @@ document.getElementById('look-who-card').style.display = 'block';
 }); 
 // Delete player functionality with confirmation modal 
 document.addEventListener('click', function(e) { 
-if (e.target.classList.contains('delete-btn')) { 
+if (e.target.classList.contains('delete-btn') && isAdmin) { 
 currentDeletePlayerRow = e.target.closest('.player-row'); 
 currentDeletePlayerName = currentDeletePlayerRow.getAttribute('data-player'); 
 // Show confirmation modal 
@@ -2793,4 +2800,4 @@ document.getElementById('step2').classList.add('active');
 }); 
 </script> 
 </body> 
-</html> 
+</html>
