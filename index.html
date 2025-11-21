@@ -1,2803 +1,557 @@
-<!DOCTYPE html> 
-<html lang="en"> 
-<head> 
-<meta charset="UTF-8"> 
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-<title>Secret Santa App</title> 
-<style> 
-/* -------------------- NEW HEADER STYLES (ADDED) --------------------- */ 
-.main-header { 
-width: 100%; 
-height: 68px; 
-background: white; 
-border-bottom: 1px solid var(--divider-color); 
-padding: 20px 120px; 
-display: flex; 
-align-items: center; 
-gap: 40px; 
-opacity: 1; 
-} 
-.logo { 
-display: flex; 
-align-items: center; 
-} 
-/* -------------------- NEW FOOTER STYLES (ADDED) --------------------- */ 
-.main-footer { 
-width: 100%; 
-height: 61px; 
-background: #192D1E; 
-padding: 20px 120px; 
-display: flex; 
-justify-content: space-between; 
-align-items: center; 
-opacity: 1; 
-} 
-.footer-left, .footer-right { 
-font-family: Nunito; 
-font-weight: 500; 
-font-size: 14px; 
-line-height: 150%; 
-color: #FAFAFA; 
-opacity: 1; 
-white-space: nowrap; 
-} 
-/* -------------------- NEW LANDING PAGE STYLES (ADDED) --------------------- */ 
-.landing-wrapper { 
-background: linear-gradient(#eef7ff, #ffffff); 
-padding: 80px 20px 120px; 
-text-align: center; 
-position: relative; 
-} 
-.landing-wrapper h1 { 
-font-size: 2.6rem; 
-font-weight: 700; 
-color: #222; 
-margin-bottom: 15px; 
-} 
-.landing-wrapper p { 
-font-size: 1.1rem; 
-color: #444; 
-max-width: 600px; 
-margin: 0 auto 30px; 
-position: relative; 
-z-index: 2; 
-} 
-.landing-btn { 
-display: inline-block; 
-background: #265b33; 
-color: white; 
-padding: 14px 34px; 
-border-radius: 40px; 
-font-size: 1.2rem; 
-font-weight: 600; 
-cursor: pointer; 
-text-decoration: none; 
-transition: 0.3s; 
-position: relative; 
-z-index: 2; 
-} 
-.landing-btn:hover { 
-background: #1c4426; 
-} 
-/* Floating decorative cards */ 
-.float-card { 
-position: absolute; 
-background: white; 
-padding: 10px 18px; 
-border-radius: 12px; 
-font-size: 0.9rem; 
-box-shadow: 0 2px 6px rgba(0,0,0,0.15); 
-display: flex; 
-align-items: center; 
-gap: 8px; 
-border: 1px dashed; 
-} 
-.float-card img { 
-width: 22px; 
-} 
-/* Positioning floating elements similar to screenshot */ 
-.fc1 { top: 160px; left: 6%; background: #D5E7D9; border-color: #76977E; } 
-.fc2 { top: 140px; right: 8%; background: #FBEFEF; border-color: #EBADAD; } 
-.fc3 { bottom: 140px; left: 10%; background: #FBEFEF; border-color: #EBADAD; } 
-.fc4 { bottom: 150px; right: 10%; background: #D5E7D9; border-color: #76977E; } 
-/* Snowflake decorations */ 
-.flake { 
-position: absolute; 
-opacity: 0.25; 
-} 
-.f1 { top: 20px; left: 0; width: 120px; } 
-.f2 { top: 30px; right: 0; width: 120px; } 
-.f3 { bottom: 40px; left: 0; width: 140px; } 
-.f4 { bottom: 40px; right: 0; width: 140px; } 
-/* Fireworks dots */ 
-.fw { 
-position: absolute; 
-width: 80px; 
-} 
-.fw1 { top: 20px; left: 45%; } 
-.fw2 { bottom: 20px; left: 50%; } 
-/* New presents image */ 
-.presents-img { 
-position: absolute; 
-width: 87px; 
-height: 87px; 
-left: 45px; 
-top: 50%; 
-transform: translateY(-50%); 
-z-index: 1; 
-} 
-/* New present image */ 
-.present-img { 
-position: absolute; 
-width: 87px; 
-height: 87px; 
-right: 45px; 
-top: 50%; 
-transform: translateY(-50%); 
-z-index: 1; 
-} 
-/* New snowglobe image */ 
-.snowglobe-img { 
-position: absolute; 
-width: 87px; 
-height: 87px; 
-right: 10px; 
-bottom: 10px; 
-} 
-@media (min-width: 768px) { 
-.snowglobe-img { 
-left: calc(50% + 230px); 
-top: calc(50% + 95px); 
-right: auto; 
-bottom: auto; 
-} 
-} 
-/* ----------------- APP PAGE STYLES ----------------- */ 
-.app-page { 
-display: none; 
-min-height: calc(100vh - 129px); /* Висота viewport мінус header і footer */ 
-background: linear-gradient(#eef7ff, #ffffff); 
-padding: 80px 20px 120px; 
-position: relative; 
-} 
-.wrapper { 
-max-width: 900px; 
-margin: 0 auto; 
-background: white; 
-border-radius: 16px; 
-padding: 40px 60px; 
-box-shadow: 0 8px 25px rgba(0,0,0,0.08); 
-position: relative; 
-z-index: 2; 
-} 
-/* Decoration image in top right corner */ 
-.wrapper-decoration { 
-position: absolute; 
-top: -90px; 
-right: -90px; 
-width: 180px; 
-height: 180px; 
-z-index: 3; 
-} 
-/* Progress steps */ 
-.progress-steps { 
-display: flex; 
-justify-content: center; 
-gap: 40px; 
-margin-bottom: 40px; 
-position: relative; 
-z-index: 2; 
-} 
-.step { 
-display: flex; 
-flex-direction: column; 
-align-items: center; 
-gap: 8px; 
-} 
-.step-number { 
-width: 30px; 
-height: 30px; 
-border-radius: 50%; 
-background: #ddd; 
-display: flex; 
-align-items: center; 
-justify-content: center; 
-font-weight: bold; 
-color: #666; 
-} 
-.step.active .step-number { 
-background: #265b33; 
-color: white; 
-} 
-.step-text { 
-font-size: 14px; 
-color: #666; 
-white-space: nowrap; 
-} 
-.step.active .step-text { 
-color: #265b33; 
-font-weight: 600; 
-} 
-h1 { 
-font-size: 32px; 
-font-weight: 700; 
-margin-bottom: 10px; 
-} 
-p.subtitle { 
-color: #555; 
-margin-bottom: 30px; 
-} 
-label { 
-display: block; 
-margin-bottom: 6px; 
-font-weight: 600; 
-} 
-.input, .textarea, .date-input, .budget-input { 
-width: 100%; 
-padding: 12px 14px; 
-border: 1px solid #ccc; 
-border-radius: 8px; 
-font-size: 15px; 
-outline: none; 
-} 
-.textarea { 
-height: 110px; 
-resize: none; 
-} 
-.row { 
-display: flex; 
-gap: 18px; 
-margin-top: 20px; 
-} 
-.half { 
-flex: 1; 
-} 
-.budget-wrapper { 
-display: flex; 
-align-items: center; 
-gap: 10px; 
-} 
-.currency-tag { 
-padding: 12px 16px; 
-background: #f3f3f3; 
-border-radius: 8px; 
-border: 1px solid #ccc; 
-} 
-.phone-wrapper { 
-display: flex; 
-gap: 10px; 
-} 
-.phone-prefix { 
-padding: 12px 16px; 
-background: #f3f3f3; 
-border-radius: 8px; 
-border: 1px solid #ccc; 
-font-size: 15px; 
-} 
-.continue-btn { 
-width: 100%; 
-padding: 16px; 
-margin-top: 30px; 
-background: #ccc; 
-color: #444; 
-border: none; 
-border-radius: 30px; 
-font-size: 17px; 
-cursor: pointer; 
-transition: background-color 0.3s; 
-} 
-.continue-btn.active { 
-background: #2C5134; 
-color: white; 
-cursor: pointer; 
-} 
-.back-link { 
-margin-top: 20px; 
-display: inline-block; 
-color: #3a593f; 
-font-size: 16px; 
-text-decoration: none; 
-} 
-.app-footer { 
-text-align: center; 
-font-size: 14px; 
-color: #444; 
-margin-top: 80px; 
-margin-bottom: 40px; 
-} 
-.app-footer a { 
-color: #000; 
-text-decoration: none; 
-margin: 0 10px; 
-} 
-/* Step 3 specific styles */ 
-.gift-budget { 
-font-size: 16px; 
-font-weight: 600; 
-margin-bottom: 25px; 
-display: flex; 
-align-items: center; 
-gap: 10px; 
-} 
-.gift-budget-icon { 
-width: 30px; 
-height: 32px; 
-} 
-.section { 
-border: 1px solid #d8e5d8; 
-background: #f3faf3; 
-padding: 25px; 
-border-radius: 12px; 
-} 
-.section-title { 
-display: flex; 
-align-items: center; 
-gap: 10px; 
-} 
-.count { 
-font-size: 12px; 
-color: #777; 
-margin-top: 3px; 
-} 
-.add-btn { 
-margin-top: 20px; 
-padding: 10px 18px; 
-border: 2px dashed #777; 
-background: white; 
-border-radius: 10px; 
-cursor: pointer; 
-font-size: 15px; 
-} 
-.add-btn:disabled { 
-opacity: 0.5; 
-cursor: not-allowed; 
-} 
-.option-box { 
-border: 1px solid #ddd; 
-padding: 18px; 
-border-radius: 12px; 
-margin-top: 20px; 
-} 
-.complete-btn { 
-width: 100%; 
-padding: 16px; 
-margin-top: 35px; 
-background: #ccc; 
-color: #444; 
-border: none; 
-border-radius: 30px; 
-font-size: 17px; 
-cursor: pointer; 
-transition: background-color 0.3s; 
-} 
-.complete-btn.active { 
-background: #2C5134; 
-color: white; 
-cursor: pointer; 
-} 
-.wish-item { 
-margin-top: 20px; 
-padding-top: 20px; 
-border-top: 1px dashed #ddd; 
-} 
-.wish-item:first-of-type { 
-margin-top: 0; 
-padding-top: 0; 
-border-top: none; 
-} 
-/* Step 4 specific styles */ 
-.section { 
-margin-bottom: 28px; 
-} 
-.note-box { 
-background: #f6faf6; 
-border-radius: 10px; 
-padding: 18px; 
-border: 1px solid #d9e3d5; 
-font-size: 15px; 
-line-height: 1.5; 
-} 
-.button { 
-width: 100%; 
-background: #1c5931; 
-padding: 14px; 
-border-radius: 10px; 
-text-align: center; 
-color: white; 
-font-size: 16px; 
-cursor: pointer; 
-border: none; 
-margin-top: 14px; 
-} 
-.button:hover { 
-background: #164a28; 
-} 
-/* Snowflake decorations for app page */ 
-.app-flake { 
-position: absolute; 
-opacity: 0.25; 
-} 
-.app-f1 { top: 20px; left: 0; width: 120px; } 
-.app-f2 { top: 30px; right: 0; width: 120px; } 
-.app-f3 { bottom: 40px; left: 0; width: 140px; } 
-.app-f4 { bottom: 40px; right: 0; width: 140px; } 
-/* Fireworks dots for app page */ 
-.app-fw { 
-position: absolute; 
-width: 80px; 
-} 
-.app-fw1 { top: 20px; left: 45%; } 
-.app-fw2 { bottom: 20px; left: 50%; } 
-/* New presents image for app page */ 
-.app-presents-img { 
-position: absolute; 
-width: 87px; 
-height: 87px; 
-left: 45px; 
-top: 50%; 
-transform: translateY(-50%); 
-z-index: 1; 
-} 
-/* New present image for app page */ 
-.app-present-img { 
-position: absolute; 
-width: 87px; 
-height: 87px; 
-right: 45px; 
-top: 50%; 
-transform: translateY(-50%); 
-z-index: 1; 
-} 
-/* New snowglobe image for app page */ 
-.app-snowglobe-img { 
-position: absolute; 
-width: 87px; 
-height: 87px; 
-right: 10px; 
-bottom: 10px; 
-} 
-@media (min-width: 768px) { 
-.app-snowglobe-img { 
-left: calc(50% + 230px); 
-top: calc(50% + 95px); 
-right: auto; 
-bottom: auto; 
-} 
-} 
-/* ---------------- COPY BUTTON STYLES ---------------- */ 
-.copy-input-wrapper { 
-position: relative; 
-display: flex; 
-align-items: center; 
-} 
-.copy-input-wrapper .input { 
-padding-right: 50px; 
-} 
-.copy-btn { 
-position: absolute; 
-right: 8px; 
-background: none; 
-border: none; 
-cursor: pointer; 
-padding: 6px; 
-border-radius: 4px; 
-display: flex; 
-align-items: center; 
-justify-content: center; 
-transition: background-color 0.2s; 
-} 
-.copy-btn:hover { 
-background-color: #f0f0f0; 
-} 
-.copy-btn svg { 
-width: 18px; 
-height: 18px; 
-fill: #666; 
-} 
-.copy-btn.copied svg { 
-fill: #2C5134; 
-} 
-.copy-tooltip { 
-position: absolute; 
-bottom: 100%; 
-right: 0; 
-background: #2C5134; 
-color: white; 
-padding: 4px 8px; 
-border-radius: 4px; 
-font-size: 12px; 
-margin-bottom: 5px; 
-white-space: nowrap; 
-opacity: 0; 
-transition: opacity 0.3s; 
-pointer-events: none; 
-} 
-.copy-btn:hover .copy-tooltip { 
-opacity: 1; 
-} 
-/* ---------------- PARTICIPANT PAGE STYLES ---------------- */ 
-.participant-page { 
-display: none; 
-min-height: calc(100vh - 129px); 
-background: linear-gradient(#eef7ff, #ffffff); 
-padding: 40px 20px; 
-position: relative; 
-} 
-.participant-container { 
-width: 100%; 
-max-width: 1200px; 
-margin: 30px auto; 
-display: flex; 
-flex-direction: column; 
-gap: 20px; 
-align-items: stretch; 
-} 
-@media (min-width: 768px) { 
-.participant-container { 
-flex-direction: row; 
-align-items: flex-start; 
-} 
-} 
-/* LEFT COLUMN */ 
-.participant-left { 
-flex: 2.2; 
-} 
-/* RIGHT COLUMN */ 
-.participant-right { 
-flex: 1.2; 
-display: flex; 
-flex-direction: column; 
-gap: 20px; 
-} 
-/* CARDS */ 
-.participant-card { 
-background: white; 
-border-radius: 14px; 
-padding: 20px; 
-box-shadow: 0 4px 16px rgba(0,0,0,0.08); 
-} 
-@media (min-width: 768px) { 
-.participant-card { 
-padding: 20px 26px; 
-} 
-} 
-/* Secret Squad Card */ 
-.squad-card { 
-background: #195a36; 
-color: white; 
-padding: 20px; 
-border-radius: 16px; 
-margin-bottom: 20px; 
-position: relative; 
-overflow: hidden; 
-} 
-@media (min-width: 768px) { 
-.squad-card { 
-padding: 28px; 
-} 
-} 
-.squad-card h2 { 
-margin-top: 0; 
-font-size: 22px; 
-} 
-@media (min-width: 768px) { 
-.squad-card h2 { 
-font-size: 26px; 
-} 
-} 
-.squad-desc { 
-max-width: 100%; 
-line-height: 1.5; 
-margin-bottom: 20px; 
-font-size: 14px; 
-} 
-@media (min-width: 768px) { 
-.squad-desc { 
-max-width: 480px; 
-margin-bottom: 22px; 
-font-size: inherit; 
-} 
-} 
-.info-boxes { 
-display: flex; 
-flex-direction: column; 
-gap: 12px; 
-} 
-@media (min-width: 768px) { 
-.info-boxes { 
-flex-direction: row; 
-gap: 20px; 
-} 
-} 
-.info-box { 
-flex: 1; 
-background: white; 
-color: black; 
-border-radius: 12px; 
-padding: 14px; 
-text-align: center; 
-font-size: 14px; 
-box-shadow: 0 3px 8px rgba(0,0,0,0.1); 
-} 
-@media (min-width: 768px) { 
-.info-box { 
-padding: 16px; 
-font-size: 15px; 
-} 
-} 
-.info-title { 
-font-weight: bold; 
-margin-bottom: 6px; 
-font-size: 13px; 
-display: flex; 
-align-items: center; 
-gap: 8px; 
-justify-content: center; 
-} 
-@media (min-width: 768px) { 
-.info-title { 
-font-size: inherit; 
-} 
-} 
-.info-title-icon { 
-width: 30px; 
-height: 32px; 
-} 
-/* Ball decoration for Secret Squad card */ 
-.squad-ball-decoration { 
-position: absolute; 
-top: 10px; 
-right: 10px; 
-width: 300px; 
-height: 166px; 
-z-index: 1; 
-} 
-/* Vector decoration for Who's Playing card */ 
-.players-vector-decoration { 
-position: absolute; 
-top: 10px; 
-right: 10px; 
-width: 366px; 
-height: 66px; 
-z-index: 1; 
-} 
-/* Participant Info Card */ 
-.participant-info-card { 
-background: #d64040; 
-color: white; 
-padding: 18px; 
-border-radius: 16px; 
-position: relative; 
-overflow: hidden; 
-} 
-@media (min-width: 768px) { 
-.participant-info-card { 
-padding: 22px; 
-} 
-} 
-.participant-info-card h3 { 
-margin-top: 0; 
-font-size: 20px; 
-} 
-@media (min-width: 768px) { 
-.participant-info-card h3 { 
-font-size: 22px; 
-} 
-} 
-.participant-info-card input { 
-width: 100%; 
-padding: 10px; 
-border-radius: 8px; 
-border: none; 
-margin-top: 6px; 
-font-size: 14px; 
-} 
-@media (min-width: 768px) { 
-.participant-info-card input { 
-padding: 12px; 
-font-size: 15px; 
-} 
-} 
-.small-text { 
-font-size: 11px; 
-opacity: 0.9; 
-margin-top: 4px; 
-} 
-@media (min-width: 768px) { 
-.small-text { 
-font-size: 12px; 
-} 
-} 
-.button-outline { 
-margin-top: 12px; 
-width: 100%; 
-padding: 10px; 
-border-radius: 10px; 
-border: 2px solid white; 
-background: transparent; 
-color: white; 
-cursor: pointer; 
-font-size: 14px; 
-} 
-@media (min-width: 768px) { 
-.button-outline { 
-margin-top: 14px; 
-padding: 12px; 
-font-size: 15px; 
-} 
-} 
-.button-outline:hover { 
-background: rgba(255,255,255,0.15); 
-} 
-/* Decoration for Participant Info Card */ 
-.participant-info-decoration { 
-position: absolute; 
-top: 10px; 
-right: 10px; 
-width: 41.9px; 
-height: 41.9px; 
-z-index: 1; 
-} 
-/* WHO'S PLAYING */ 
-.players-card { 
-position: relative; 
-overflow: hidden; 
-} 
-.players-card h2 { 
-font-size: 20px; 
-margin-bottom: 12px; 
-position: relative; 
-display: flex; 
-align-items: center; 
-justify-content: center; 
-gap: 10px; 
-} 
-@media (min-width: 768px) { 
-.players-card h2 { 
-font-size: 24px; 
-} 
-} 
-.player-row { 
-background: #f9fafb; 
-padding: 12px; 
-border-radius: 10px; 
-margin-bottom: 8px; 
-font-size: 14px; 
-display: flex; 
-justify-content: space-between; 
-align-items: center; 
-} 
-@media (min-width: 768px) { 
-.player-row { 
-padding: 14px; 
-margin-bottom: 10px; 
-font-size: 16px; 
-} 
-} 
-.you-label { 
-font-size: 12px; 
-color: #195a36; 
-} 
-.admin-label { 
-font-size: 12px; 
-color: #d32f2f; 
-font-weight: bold; 
-} 
-@media (min-width: 768px) { 
-.you-label { 
-font-size: 13px; 
-} 
-.admin-label { 
-font-size: 13px; 
-} 
-} 
-.delete-btn { 
-background: #d32f2f; 
-color: white; 
-border: none; 
-border-radius: 4px; 
-padding: 4px 8px; 
-cursor: pointer; 
-font-size: 12px; 
-} 
-.delete-btn:hover { 
-background: #b71c1c; 
-} 
-/* WISHLIST */ 
-.wishlist-card h2 { 
-margin: 0 0 12px 0; 
-font-size: 20px; 
-text-align: center; 
-background: #2C5134; 
-color: white; 
-padding: 12px; 
-border-radius: 8px; 
-position: relative; 
-display: flex; 
-align-items: center; 
-justify-content: center; 
-gap: 10px; 
-} 
-@media (min-width: 768px) { 
-.wishlist-card h2 { 
-margin: 0 0 14px 0; 
-font-size: inherit; 
-} 
-} 
-.wishlist-snowflake { 
-width: 42px; 
-height: 42px; 
-position: absolute; 
-} 
-.wishlist-snowflake-left { 
-left: 10px; 
-} 
-.wishlist-snowflake-right { 
-right: 10px; 
-} 
-.wish-row { 
-background: white; 
-border: 1px solid #e9ecef; 
-padding: 10px; 
-border-radius: 8px; 
-display: flex; 
-justify-content: space-between; 
-margin-bottom: 8px; 
-font-size: 13px; 
-} 
-@media (min-width: 768px) { 
-.wish-row { 
-padding: 12px; 
-margin-bottom: 10px; 
-font-size: inherit; 
-} 
-} 
-.wish-link { 
-color: #195a36; 
-font-size: 12px; 
-text-decoration: underline; 
-cursor: pointer; 
-} 
-@media (min-width: 768px) { 
-.wish-link { 
-font-size: 14px; 
-} 
-} 
-.button-green { 
-margin-top: 10px; 
-width: 100%; 
-padding: 11px; 
-border-radius: 10px; 
-border: 2px solid #195a36; 
-background: white; 
-color: #195a36; 
-font-weight: bold; 
-cursor: pointer; 
-font-size: 14px; 
-} 
-@media (min-width: 768px) { 
-.button-green { 
-padding: 13px; 
-font-size: inherit; 
-} 
-} 
-.button-green:hover { 
-background: #195a36; 
-color: white; 
-} 
-/* ---------------- LOOK WHO YOU GOT CARD STYLES ---------------- */ 
-.look-who-card { 
-display: none; 
-width: 100%; 
-text-align: center; 
-background: white; 
-border-radius: 20px; 
-padding: 32px 24px; 
-box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15); 
-position: relative; 
-} 
-.look-who-top-bg { 
-background: #e3d5c7; 
-height: 90px; 
-position: absolute; 
-top: 0; 
-left: 0; 
-right: 0; 
-border-radius: 20px 20px 0 0; 
-} 
-.look-who-santa-img { 
-width: 256px; 
-height: 161px; 
-position: absolute; 
-top: -130px; 
-left: 50%; 
-transform: translateX(-50%); 
-z-index: 2; 
-} 
-.look-who-card h1 { 
-margin-top: 0; 
-color: #c62828; 
-font-size: 26px; 
-font-weight: 700; 
-position: relative; 
-z-index: 1; 
-height: 90px; 
-display: flex; 
-justify-content: center; 
-align-items: center; 
-line-height: 1; 
-transform: translateY(-35px); 
-} 
-.look-who-subtitle { 
-margin: 16px 0 10px; 
-color: #444; 
-font-size: 15px; 
-position: relative; 
-z-index: 1; 
-} 
-.look-who-name { 
-font-size: 26px; 
-font-weight: 700; 
-margin-bottom: 28px; 
-color: #000; 
-position: relative; 
-z-index: 1; 
-} 
-.look-who-btn { 
-display: inline-block; 
-padding: 12px 28px; 
-border-radius: 40px; 
-border: 2px solid #2f5330; 
-color: #2f5330; 
-font-size: 16px; 
-text-decoration: none; 
-font-weight: 600; 
-transition: 0.2s; 
-position: relative; 
-z-index: 1; 
-cursor: pointer; 
-background: white; 
-} 
-.look-who-btn:hover { 
-background: #2f5330; 
-color: white; 
-} 
-/* ---------------- DRAW NAMES CARD STYLES ---------------- */ 
-.draw-names-card { 
-display: none; 
-width: 100%; 
-text-align: center; 
-background: white; 
-border-radius: 20px; 
-padding: 32px 24px; 
-box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15); 
-position: relative; 
-margin-bottom: 20px; 
-} 
-.draw-names-top-bg { 
-background: #e3d5c7; 
-height: 90px; 
-position: absolute; 
-top: 0; 
-left: 0; 
-right: 0; 
-border-radius: 20px 20px 0 0; 
-} 
-.draw-names-img { 
-width: 150px; 
-height: 106px; 
-position: absolute; 
-top: -80px; 
-right: 10px; 
-z-index: 2; 
-} 
-.draw-names-card h1 { 
-margin-top: 0; 
-color: #CC3332; 
-font-size: 20px; 
-font-weight: 500; 
-position: relative; 
-z-index: 1; 
-height: 90px; 
-display: flex; 
-justify-content: center; 
-align-items: center; 
-line-height: 150%; 
-transform: translateY(-35px); 
-} 
-.draw-names-description { 
-margin: 16px 0 10px; 
-color: #444; 
-font-size: 15px; 
-position: relative; 
-z-index: 1; 
-line-height: 150%; 
-} 
-.draw-names-btn { 
-display: inline-block; 
-padding: 12px 28px; 
-border-radius: 40px; 
-border: 2px solid #2f5330; 
-color: #2f5330; 
-font-size: 16px; 
-text-decoration: none; 
-font-weight: 600; 
-transition: 0.2s; 
-position: relative; 
-z-index: 1; 
-background: white; 
-cursor: pointer; 
-} 
-.draw-names-btn:hover { 
-background: #2f5330; 
-color: white; 
-} 
-/* ---------------- WISHLIST PAGE STYLES ---------------- */ 
-.wishlist-page { 
-display: none; 
-min-height: calc(100vh - 129px); 
-background: linear-gradient(#eef7ff, #ffffff); 
-padding: 40px 20px; 
-position: relative; 
-} 
-.wishlist-container { 
-width: 100%; 
-max-width: 800px; 
-margin: 30px auto; 
-background: white; 
-border-radius: 16px; 
-padding: 40px; 
-box-shadow: 0 8px 25px rgba(0,0,0,0.08); 
-position: relative; 
-z-index: 2; 
-overflow: hidden; 
-} 
-.wishlist-decoration { 
-position: absolute; 
-top: 20px; 
-left: 20px; 
-width: 69px; 
-height: 56px; 
-z-index: 3; 
-} 
-.wishlist-container h1 { 
-text-align: center; 
-margin-bottom: 30px; 
-color: #195a36; 
-position: relative; 
-display: flex; 
-align-items: center; 
-justify-content: center; 
-gap: 10px; 
-} 
-.wishlist-items { 
-display: flex; 
-flex-direction: column; 
-gap: 15px; 
-} 
-.wishlist-item { 
-background: #f9fafb; 
-padding: 20px; 
-border-radius: 12px; 
-border: 1px solid #e9ecef; 
-} 
-.wishlist-item h3 { 
-margin: 0 0 10px 0; 
-color: #195a36; 
-font-size: 18px; 
-} 
-.wishlist-item-link { 
-color: #195a36; 
-text-decoration: underline; 
-cursor: pointer; 
-font-size: 14px; 
-display: inline-block; 
-margin-top: 8px; 
-} 
-.wishlist-item-link:hover { 
-color: #134028; 
-} 
-.back-button { 
-display: block; 
-width: 200px; 
-margin: 30px auto 0; 
-padding: 12px; 
-background: #195a36; 
-color: white; 
-border: none; 
-border-radius: 8px; 
-cursor: pointer; 
-text-align: center; 
-text-decoration: none; 
-font-size: 16px; 
-} 
-.back-button:hover { 
-background: #134028; 
-} 
-/* ---------------- PERSONAL INFO PAGE STYLES ---------------- */ 
-.personal-info-page { 
-display: none; 
-min-height: calc(100vh - 129px); 
-background: linear-gradient(#eef7ff, #ffffff); 
-padding: 40px 20px; 
-position: relative; 
-} 
-.personal-info-container { 
-width: 100%; 
-max-width: 820px; 
-margin: 30px auto; 
-background: white; 
-border-radius: 16px; 
-padding: 40px 50px; 
-box-shadow: 0 8px 25px rgba(0,0,0,0.08); 
-position: relative; 
-z-index: 2; 
-overflow: hidden; 
-} 
-.personal-info-decoration { 
-position: absolute; 
-top: 20px; 
-left: 20px; 
-width: 69px; 
-height: 56px; 
-z-index: 3; 
-} 
-.close-btn { 
-position: absolute; 
-right: 35px; 
-top: 35px; 
-font-size: 26px; 
-color: #3d5d3f; 
-cursor: pointer; 
-} 
-.personal-info-container h1 { 
-font-size: 32px; 
-font-weight: 700; 
-margin: 0 0 8px; 
-text-align: center; 
-} 
-.personal-info-subtitle { 
-margin: 0 0 25px; 
-color: #555; 
-text-align: center; 
-} 
-.info-box { 
-border: 1px solid #CAD8C9; 
-padding: 30px; 
-border-radius: 12px; 
-} 
-.grid { 
-display: grid; 
-grid-template-columns: 1fr 1fr; 
-gap: 25px 20px; 
-} 
-.label { 
-font-size: 14px; 
-color: #555; 
-margin-bottom: 4px; 
-} 
-.value { 
-font-size: 17px; 
-font-weight: 600; 
-color: #000; 
-} 
-.btn-row { 
-margin-top: 30px; 
-text-align: right; 
-display: none; 
-} 
-.back-btn { 
-background: #2F5330; 
-color: white; 
-padding: 14px 32px; 
-border-radius: 30px; 
-display: inline-block; 
-font-size: 16px; 
-text-decoration: none; 
-border: none; 
-cursor: pointer; 
-} 
-.header { 
-display: none; 
-} 
-.header img { 
-width: 70px; 
-} 
-/* ---------------- LOOK WHO YOU GOT PAGE STYLES ---------------- */ 
-.look-who-page { 
-display: none; 
-min-height: calc(100vh - 129px); 
-background: linear-gradient(#eef7ff, #ffffff); 
-padding: 40px 20px; 
-position: relative; 
-} 
-.look-who-container { 
-width: 100%; 
-max-width: 1100px; 
-margin: 40px auto; 
-padding: 0 20px; 
-} 
-.look-who-header { 
-background: #e6d8c7; 
-padding: 35px 0; 
-text-align: center; 
-font-size: 32px; 
-color: #b32727; 
-font-weight: 700; 
-letter-spacing: 1px; 
-} 
-.look-who-grid { 
-display: grid; 
-grid-template-columns: 1fr 1fr; 
-gap: 40px; 
-} 
-.look-who-card-styled { 
-background: #f9fdf9; 
-padding: 30px; 
-border: 1px solid #d3e4d3; 
-border-radius: 12px; 
-position: relative; 
-} 
-.snowflakes { 
-position: absolute; 
-top: 15px; 
-right: 20px; 
-font-size: 20px; 
-color: #7da28c; 
-} 
-.field-title { 
-font-size: 14px; 
-color: #686868; 
-margin-bottom: 4px; 
-} 
-.field-value { 
-font-size: 18px; 
-font-weight: 600; 
-margin-bottom: 20px; 
-} 
-.wish-item-styled { 
-background: #ffffff; 
-padding: 18px 26px; 
-border-radius: 12px; 
-margin-bottom: 15px; 
-box-shadow: 0 3px 10px rgba(0,0,0,0.08); 
-display: flex; 
-justify-content: space-between; 
-align-items: center; 
-} 
-.link { 
-font-size: 16px; 
-color: #004d2b; 
-font-weight: 600; 
-text-decoration: underline; 
-cursor: pointer; 
-} 
-.btn { 
-display: block; 
-margin: 40px auto 0; 
-padding: 16px 40px; 
-background: #1e4422; 
-color: white; 
-border-radius: 40px; 
-text-decoration: none; 
-font-size: 18px; 
-font-weight: 600; 
-cursor: pointer; 
-border: none; 
-text-align: center; 
-} 
-.btn:hover { 
-background: #15331a; 
-} 
-/* ---------------- ADMIN TOGGLE STYLES ---------------- */ 
-.admin-toggle { 
-display: flex; 
-align-items: center; 
-gap: 10px; 
-margin-top: 20px; 
-padding: 15px; 
-border: 1px solid #d8e5d8; 
-background: #f3faf3; 
-border-radius: 12px; 
-cursor: pointer; 
-} 
-.admin-toggle-text { 
-font-weight: 600; 
-color: #265b33; 
-} 
-.admin-toggle-circle { 
-width: 20px; 
-height: 20px; 
-border-radius: 50%; 
-border: 2px solid #265b33; 
-position: relative; 
-transition: background-color 0.3s; 
-} 
-.admin-toggle-circle.active { 
-background-color: #265b33; 
-} 
-.admin-toggle-circle.active::after { 
-content: ''; 
-position: absolute; 
-top: 4px; 
-left: 4px; 
-width: 8px; 
-height: 8px; 
-background-color: white; 
-border-radius: 50%; 
-} 
-.admin-password-section { 
-display: none; 
-margin-top: 15px; 
-padding: 15px; 
-border: 1px solid #d8e5d8; 
-background: #f9fdf9; 
-border-radius: 12px; 
-} 
-.admin-password-section.active { 
-display: block; 
-} 
-.admin-password-input { 
-width: 100%; 
-padding: 12px 14px; 
-border: 1px solid #ccc; 
-border-radius: 8px; 
-font-size: 15px; 
-outline: none; 
-margin-bottom: 10px; 
-} 
-.admin-password-btn { 
-padding: 10px 20px; 
-background: #265b33; 
-color: white; 
-border: none; 
-border-radius: 8px; 
-cursor: pointer; 
-font-size: 15px; 
-} 
-.admin-password-btn:hover { 
-background: #1c4426; 
-} 
-.admin-password-error { 
-color: #d32f2f; 
-font-size: 14px; 
-margin-top: 8px; 
-display: none; 
-} 
-/* ---------------- DELETE CONFIRMATION MODAL STYLES ---------------- */ 
-.delete-modal { 
-display: none; 
-position: fixed; 
-top: 0; 
-left: 0; 
-width: 100%; 
-height: 100%; 
-background-color: rgba(0, 0, 0, 0.5); 
-z-index: 1000; 
-justify-content: center; 
-align-items: center; 
-} 
-.delete-modal-content { 
-background: white; 
-padding: 30px; 
-border-radius: 16px; 
-box-shadow: 0 8px 25px rgba(0,0,0,0.15); 
-max-width: 400px; 
-width: 90%; 
-text-align: center; 
-position: relative; 
-} 
-.delete-modal-title { 
-font-size: 20px; 
-font-weight: 600; 
-margin-bottom: 15px; 
-color: #d32f2f; 
-} 
-.delete-modal-text { 
-font-size: 16px; 
-color: #555; 
-margin-bottom: 25px; 
-line-height: 1.5; 
-} 
-.delete-modal-buttons { 
-display: flex; 
-gap: 15px; 
-justify-content: center; 
-} 
-.delete-modal-btn { 
-padding: 10px 25px; 
-border: none; 
-border-radius: 8px; 
-font-size: 15px; 
-cursor: pointer; 
-transition: background-color 0.3s; 
-} 
-.delete-modal-yes { 
-background: #d32f2f; 
-color: white; 
-} 
-.delete-modal-yes:hover { 
-background: #b71c1c; 
-} 
-.delete-modal-no { 
-background: #f0f0f0; 
-color: #333; 
-} 
-.delete-modal-no:hover { 
-background: #e0e0e0; 
-} 
-/* Mobile-specific adjustments for header and footer */ 
-@media (max-width: 768px) { 
-.main-header { 
-padding: 20px; 
-height: 60px; 
-} 
-.main-footer { 
-padding: 20px; 
-height: auto; 
-flex-direction: column; 
-gap: 10px; 
-text-align: center; 
-} 
-.footer-left, .footer-right { 
-white-space: normal; 
-} 
-.float-card { 
-display: none; /* Hide floating cards on mobile */ 
-} 
-.presents-img, 
-.present-img, 
-.snowglobe-img, 
-.app-presents-img, 
-.app-present-img, 
-.app-snowglobe-img { 
-width: 60px; 
-height: 60px; 
-} 
-.flake, 
-.app-flake { 
-width: 80px; 
-} 
-.fw, 
-.app-fw { 
-width: 60px; 
-} 
-.wishlist-container { 
-padding: 20px; 
-} 
-.personal-info-container { 
-padding: 20px; 
-} 
-.grid { 
-grid-template-columns: 1fr; 
-gap: 15px; 
-} 
-.header { 
-flex-direction: column; 
-text-align: center; 
-gap: 8px; 
-} 
-.header img { 
-width: 50px; 
-} 
-.squad-ball-decoration { 
-width: 150px; 
-height: 83px; 
-top: 8px; 
-right: 8px; 
-} 
-.players-vector-decoration { 
-width: 183px; 
-height: 33px; 
-top: 8px; 
-right: 8px; 
-} 
-.wishlist-snowflake { 
-width: 32px; 
-height: 32px; 
-} 
-.participant-info-decoration { 
-width: 35px; 
-height: 35px; 
-top: 8px; 
-right: 8px; 
-} 
-.look-who-card { 
-padding: 24px 20px; 
-} 
-.look-who-santa-img { 
-width: 200px; 
-height: 126px; 
-top: -100px; 
-} 
-.look-who-card h1 { 
-font-size: 22px; 
-height: 70px; 
-transform: translateY(-25px); 
-} 
-.look-who-name { 
-font-size: 22px; 
-} 
-.look-who-btn { 
-padding: 10px 24px; 
-font-size: 15px; 
-} 
-.draw-names-card { 
-padding: 24px 20px; 
-} 
-.draw-names-img { 
-width: 120px; 
-height: 85px; 
-top: -60px; 
-} 
-.draw-names-card h1 { 
-font-size: 18px; 
-height: 70px; 
-transform: translateY(-25px); 
-} 
-.draw-names-btn { 
-padding: 10px 24px; 
-font-size: 15px; 
-} 
-.look-who-grid { 
-grid-template-columns: 1fr; 
-gap: 20px; 
-} 
-.look-who-header { 
-padding: 25px 0; 
-font-size: 26px; 
-} 
-.delete-modal-content { 
-padding: 20px; 
-} 
-.delete-modal-buttons { 
-flex-direction: column; 
-} 
-.delete-modal-btn { 
-width: 100%; 
-} 
-} 
-/* ---------------- YOUR ORIGINAL STYLES BELOW ---------------- */ 
-:root { 
---primary-color: #d32f2f; 
---primary-light: #ff6659; 
---primary-dark: #9a0007; 
---secondary-color: #388e3c; 
---secondary-light: #6abf69; 
---secondary-dark: #00600f; 
---background-color: #f5f5f5; 
---surface-color: #ffffff; 
---text-primary: #212121; 
---text-secondary: #757575; 
---divider-color: #bdbdbd; 
---shadow: 0 2px 4px rgba(0,0,0,0.1); 
---shadow-hover: 0 4px 8px rgba(0,0,0,0.15); 
-} 
-/* ---------- YOUR ORIGINAL CSS KEPT AS IS ---------- */ 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; } 
-body { background-color: var(--background-color); color: var(--text-primary); line-height: 1.6; } 
-.container { max-width: 1200px; margin: 0 auto; padding: 20px; } 
-header { display:none; } /* Hidden because landing page replaces it */ 
-/* ... (весь інший CSS залишився без змін) ... */ 
-</style> 
-</head> 
-<body> 
-<!-- ----------------- DELETE CONFIRMATION MODAL ------------------ --> 
-<div class="delete-modal" id="delete-modal"> 
-<div class="delete-modal-content"> 
-<div class="delete-modal-title">Delete Participant</div> 
-<div class="delete-modal-text">Are you sure, that you want to delete the participant?</div> 
-<div class="delete-modal-buttons"> 
-<button class="delete-modal-btn delete-modal-yes" id="delete-yes-btn">Yes</button> 
-<button class="delete-modal-btn delete-modal-no" id="delete-no-btn">No</button> 
-</div> 
-</div> 
-</div> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret Santa App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div class="delete-modal" id="delete-modal">
+        <div class="delete-modal-content">
+            <div class="delete-modal-title">Delete Participant</div>
+            <div class="delete-modal-text">Are you sure, that you want to delete the participant?</div>
+            <div class="delete-modal-buttons">
+                <button class="delete-modal-btn delete-modal-yes" id="delete-yes-btn">Yes</button>
+                <button class="delete-modal-btn delete-modal-no" id="delete-no-btn">No</button>
+            </div>
+        </div>
+    </div>
 
-<!-- ----------------- NEW HEADER (ADDED) ------------------ --> 
-<header class="main-header"> 
-<!-- Логотип в лівій частині --> 
-<div class="logo"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Logo%20(1).png" alt="Logo" width="187" height="28"> 
-</div> 
-</header> 
-<!-- ----------------- NEW LANDING PAGE (ADDED) ------------------ --> 
-<section class="landing-wrapper" id="landing"> 
-<!-- Decorations --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="flake f1"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(1).png" class="flake f2"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(2).png" class="flake f3"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(3).png" class="flake f4"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework.png" class="fw fw1"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework%20(1).png" class="fw fw2"> 
-<!-- New presents image --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="presents-img"> 
-<!-- New present image --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/present.png" class="present-img"> 
-<!-- New snowglobe image --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowglobe.png" class="snowglobe-img"> 
-<!-- Floating feature cards --> 
-<div class="float-card fc1"><img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Christmas%20Icons.png"> Have fun</div> 
-<div class="float-card fc2"><img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Christmas%20Icons%20(1).png"> Match people</div> 
-<div class="float-card fc3"><img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Christmas%20Icons%20(2).png"> Share wishes</div> 
-<div class="float-card fc4"><img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Christmas%20Icons%20(3).png"> Give presents</div> 
-<h1>Make This Holiday Magical<br>with Secret Nick</h1> 
-<p> 
-It's a secret — don't tell who you're matched with!<br> 
-Use the wishlist or preferences to pick the perfect gift.<br> 
-Be ready for the big gift exchange! 
-</p> 
-<a href="#" class="landing-btn" id="create-room-btn">Create Your Room</a> 
-</section> 
-<!-- ----------------- APP PAGE ----------------- --> 
-<section class="app-page" id="app-page"> 
-<!-- Decorations for app page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="app-flake app-f1"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(1).png" class="app-flake app-f2"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(2).png" class="app-flake app-f3"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(3).png" class="app-flake app-f4"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework.png" class="app-fw app-fw1"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework%20(1).png" class="app-fw app-fw2"> 
-<!-- New presents image for app page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="app-presents-img"> 
-<!-- New present image for app page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/present.png" class="app-present-img"> 
-<!-- New snowglobe image for app page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowglobe.png" class="app-snowglobe-img"> 
-<!-- Progress Steps --> 
-<div class="progress-steps" id="progress-steps"> 
-<div class="step active" id="step1"> 
-<div class="step-number">1</div> 
-<div class="step-text">Create room</div> 
-</div> 
-<div class="step" id="step2"> 
-<div class="step-number">2</div> 
-<div class="step-text">Add personal info</div> 
-</div> 
-<div class="step" id="step3"> 
-<div class="step-number">3</div> 
-<div class="step-text">Add wishlist</div> 
-</div> 
-</div> 
-<div class="wrapper" id="form-wrapper"> 
-<!-- Decoration image in top right corner for step 1 --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="wrapper-decoration" id="step1-decoration"> 
-<!-- Step 1 Content --> 
-<div id="step1-content"> 
-<h1>Create Your Secret Nick Room</h1> 
-<p class="subtitle">Let the holiday magic begin! Set up your gift exchange in just a few steps.</p> 
-<!-- ROOM NAME --> 
-<label>Room name *</label> 
-<input type="text" class="input" id="room-name" placeholder="Enter your room name"> 
-<!-- ROOM DESCRIPTION --> 
-<label style="margin-top:20px;">Room description *</label> 
-<textarea class="textarea" id="room-description" placeholder="Enter your message here..."></textarea> 
-<!-- DATE & BUDGET --> 
-<div class="row"> 
-<div class="half"> 
-<label>Gift Exchange date *</label> 
-<input type="date" class="date-input" id="exchange-date"> 
-</div> 
-<div class="half"> 
-<label>Gift budget *</label> 
-<div class="budget-wrapper"> 
-<input type="number" class="budget-input" id="gift-budget" placeholder="Type in your budget"> 
-<div class="currency-tag">UAH</div> 
-</div> 
-<small style="color:#777;">0 means unlimited budget</small> 
-</div> 
-</div> 
-<!-- BUTTON --> 
-<button class="continue-btn" id="continue-btn">Continue</button> 
-</div> 
-<!-- Step 2 Content --> 
-<div id="step2-content" style="display: none;"> 
-<!-- Decoration image in top right corner for step 2 --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/car.png" class="wrapper-decoration" id="step2-decoration"> 
-<h1>Add Your Details</h1> 
-<p class="subtitle">Secret Nick needs to know where to send your present!</p> 
-<!-- NAME FIELDS --> 
-<div class="row"> 
-<div class="half"> 
-<label>First name *</label> 
-<input type="text" class="input" id="first-name" placeholder="e.g. Nickolas"> 
-</div> 
-<div class="half"> 
-<label>Last name *</label> 
-<input type="text" class="input" id="last-name" placeholder="e.g. Secret"> 
-</div> 
-</div> 
-<!-- PHONE + EMAIL --> 
-<div class="row" style="margin-top:25px;"> 
-<div class="half"> 
-<label>Phone number *</label> 
-<div class="phone-wrapper"> 
-<div class="phone-prefix">+380</div> 
-<input type="text" class="input" id="phone" placeholder="77 777 77 77"> 
-</div> 
-</div> 
-<div class="half"> 
-<label>Email</label> 
-<input type="email" class="input" id="email" placeholder="nickolas@example.com"> 
-</div> 
-</div> 
-<!-- ADDRESS --> 
-<label style="margin-top:25px;">Your delivery address (no North Pole required!) *</label> 
-<textarea class="textarea" id="address" placeholder="Where should St. Nick deliver your gift?"></textarea> 
-<!-- BUTTON --> 
-<button class="continue-btn" id="continue-btn-step2">Continue</button> 
-<!-- BACK --> 
-<a href="#" class="back-link" id="back-link-step2">← Back to the previous step</a> 
-</div> 
-<!-- Step 3 Content --> 
-<div id="step3-content" style="display: none;"> 
-<!-- Decoration image in top right corner for step 3 --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="wrapper-decoration" id="step3-decoration"> 
-<h1>Add Your Wishes</h1> 
-<p class="subtitle">Let your Secret Nick know what would make you smile this season.</p> 
-<div class="gift-budget" id="gift-budget-display"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="gift-budget-icon"> 
-Gift Budget: <strong>0 UAH</strong> 
-</div> 
-<!-- Wish Option 1 --> 
-<div class="section"> 
-<div class="section-title"> 
-<input type="radio" name="wishType" checked id="wish-ideas"> 
-<label for="wish-ideas">I have gift ideas! (add up to 5 gift ideas)</label> 
-</div> 
-<div id="wish-items-container"> 
-<!-- First wish item --> 
-<div class="wish-item" id="wish-item-1"> 
-<div class="row"> 
-<div class="half"> 
-<label>I wish for *</label> 
-<input type="text" class="input wish-item-input" placeholder="Enter your wish name" maxlength="40"> 
-<div class="count">0 / 40</div> 
-</div> 
-<div class="half"> 
-<label>Add link</label> 
-<input type="url" class="input wish-link-input" placeholder="E.g. https://example.com/item"> 
-</div> 
-</div> 
-</div> 
-</div> 
-<button class="add-btn" id="add-wish-btn">+ Add Wish</button> 
-</div> 
-<!-- Wish Option 2 --> 
-<div class="option-box"> 
-<label> 
-<input type="radio" name="wishType" id="surprise-gift"> 
-I want a surprise gift 
-</label> 
-</div> 
-<!-- Button --> 
-<button class="complete-btn" id="complete-btn">Complete</button> 
-<!-- Back --> 
-<a href="#" class="back-link" id="back-link-step3">← Back to the previous step</a> 
-</div> 
-<!-- Step 4 Content --> 
-<div id="step4-content" style="display: none;"> 
-<!-- Decoration image in top right corner for step 4 --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/wreath.png" class="wrapper-decoration" id="step4-decoration"> 
-<h1>Your Secret Nick Room is Ready!</h1> 
-<p>Share the link below with up to 20 friends to invite them — and don't lose your personal link! Let the festive magic begin!</p> 
-<!-- Admin Toggle --> 
-<div class="admin-toggle" id="admin-toggle"> 
-<div class="admin-toggle-circle" id="admin-toggle-circle"></div> 
-<div class="admin-toggle-text">I am admin</div> 
-</div> 
-<!-- Admin Password Section --> 
-<div class="admin-password-section" id="admin-password-section"> 
-<label>Enter admin password:</label> 
-<input type="password" class="admin-password-input" id="admin-password" placeholder="Enter password"> 
-<button class="admin-password-btn" id="admin-password-btn">Submit</button> 
-<div class="admin-password-error" id="admin-password-error">Incorrect password. Please try again.</div> 
-</div> 
-<!-- Room Link --> 
-<div class="section"> 
-<label>Your Room Link</label> 
-<div class="copy-input-wrapper"> 
-<input type="text" class="input" id="room-link" value="https://secretnickswap.com/join/abc123" readonly> 
-<button class="copy-btn" data-target="room-link"> 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> 
-<path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/> 
-</svg> 
-<span class="copy-tooltip">Copy to clipboard</span> 
-</button> 
-</div> 
-</div> 
-<!-- Invitation Note --> 
-<div class="section"> 
-<label>Invitation Note</label> 
-<div class="note-box"> 
-Hey!<br><br> 
-Join our Secret Nick and make this holiday season magical! 🎄<br> 
-You'll get to surprise someone with a gift — and receive one too. 🎁✨<br><br> 
-🔗 Join here:<br> 
-https://secretnickswap.com/join/abc123 
-</div> 
-</div> 
-<!-- Personal Participant Link --> 
-<div class="section"> 
-<label>Your Personal Participant Link</label> 
-<p style="margin: 4px 0 8px; color:#777; font-size:14px;"> 
-This is your unique personal link to access the Secret Nick room. 
-</p> 
-<div class="copy-input-wrapper"> 
-<input type="text" class="input" id="personal-link" value="https://secretnickswap.com/join/yourlink456" readonly> 
-<button class="copy-btn" data-target="personal-link"> 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> 
-<path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/> 
-</svg> 
-<span class="copy-tooltip">Copy to clipboard</span> 
-</button> 
-</div> 
-<p style="margin-top:6px; color:#c12727; font-size:14px;">Do not share this link with other users</p> 
-</div> 
-<button class="button" id="visit-room-btn">Visit Your Room</button> 
-</div> 
-</div> 
-</section> 
-<!-- ----------------- PARTICIPANT PAGE ----------------- --> 
-<section class="participant-page" id="participant-page"> 
-<!-- Decorations for participant page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="app-flake app-f1"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(1).png" class="app-flake app-f2"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(2).png" class="app-flake app-f3"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(3).png" class="app-flake app-f4"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework.png" class="app-fw app-fw1"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework%20(1).png" class="app-fw app-fw2"> 
-<!-- New presents image for participant page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="app-presents-img"> 
-<!-- New present image for participant page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/present.png" class="app-present-img"> 
-<!-- New snowglobe image for participant page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowglobe.png" class="app-snowglobe-img"> 
-<!-- MAIN CONTENT --> 
-<div class="participant-container"> 
-<!-- LEFT SIDE --> 
-<div class="participant-left"> 
-<!-- Secret Squad Card --> 
-<div class="squad-card"> 
-<!-- Ball decoration in top right corner --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Ball%20Decor.png" class="squad-ball-decoration"> 
-<h2>Secret Squad</h2> 
-<p class="squad-desc"> 
-Hey everyone!<br> 
-Welcome to our Secret Nick gift exchange! Check the wishlist, see who's playing, and get ready for some holiday magic. Let's make this a festive and fun surprise! 
-</p> 
-<div class="info-boxes"> 
-<div class="info-box"> 
-<div class="info-title"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="info-title-icon"> 
-Exchange Date 
-</div> 
-<span id="participant-exchange-date">06 Dec 2025</span> 
-</div> 
-<div class="info-box"> 
-<div class="info-title"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="info-title-icon"> 
-Gift Budget 
-</div> 
-<span id="participant-gift-budget">1000 UAH</span> 
-</div> 
-</div> 
-</div> 
-<!-- Who's Playing --> 
-<div class="participant-card players-card"> 
-<!-- Vector decoration in top right corner --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Vector.png" class="players-vector-decoration"> 
-<h2>Who's Playing? <span style="color:#555; font-size:16px;" id="players-count">10/20</span></h2> 
-<div class="player-row" data-player="Anastasiia Petrenko"> 
-Anastasiia Petrenko 
-<button class="delete-btn admin-only" style="display: none;">Delete</button> 
-</div> 
-<div class="player-row" data-player="Kostiantyna Nechyporenko"> 
-Kostiantyna Nechyporenko 
-<button class="delete-btn admin-only" style="display: none;">Delete</button> 
-</div> 
-<div class="player-row" id="current-user-row" data-player="Maria Shevchenko"> 
-Maria Shevchenko <span class="you-label">You</span> 
-</div> 
-<div class="player-row" data-player="Mykyta Slivchuk"> 
-Mykyta Slivchuk 
-<button class="delete-btn admin-only" style="display: none;">Delete</button> 
-</div> 
-<div class="player-row" data-player="Kateryna Moravska"> 
-Kateryna Moravska 
-<button class="delete-btn admin-only" style="display: none;">Delete</button> 
-</div> 
-<div class="player-row" data-player="Ivan Moldvinenko"> 
-Ivan Moldvinenko 
-<button class="delete-btn admin-only" style="display: none;">Delete</button> 
-</div> 
-<div class="player-row" data-player="Serhii Kovalenko"> 
-Serhii Kovalenko 
-<button class="delete-btn admin-only" style="display: none;">Delete</button> 
-</div> 
-<div class="player-row" data-player="Valeria Solominka"> 
-Valeria Solominka 
-<button class="delete-btn admin-only" style="display: none;">Delete</button> 
-</div> 
-<div class="player-row" data-player="Veronica Andriyenko"> 
-Veronica Andriyenko 
-<button class="delete-btn admin-only" style="display: none;">Delete</button> 
-</div> 
-<div class="player-row" data-player="Ivan Kolodii"> 
-Ivan Kolodii 
-<button class="delete-btn admin-only" style="display: none;">Delete</button> 
-</div> 
-</div> 
-</div> 
-<!-- RIGHT SIDE --> 
-<div class="participant-right"> 
-<!-- Participant card --> 
-<div class="participant-info-card"> 
-<!-- Decoration in top right corner of red rectangle --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(1).png" class="participant-info-decoration"> 
-<h3>Hi, <span id="participant-name">Maria</span></h3> 
-<p>Get ready for happy gift exchange and fun in Secret Nick game!</p> 
-<p>Your Participant Link</p> 
-<input type="text" id="participant-personal-link" value="https://secretnickswap.com/join/yourlink456" readonly /> 
-<div class="small-text">Do not share this link with other users</div> 
-<button class="button-outline" id="view-info-btn">View Information</button> 
-</div> 
-<!-- Look Who You Got Card --> 
-<div class="look-who-card" id="look-who-card"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/S.Nick.png" alt="Santa" class="look-who-santa-img"> 
-<div class="look-who-top-bg"></div> 
-<h1>Look Who You Got!</h1> 
-<p class="look-who-subtitle">You are a Secret Nick to</p> 
-<div class="look-who-name" id="look-who-name">Anastasiia Petrenko</div> 
-<button class="look-who-btn" id="look-who-btn">Read Details</button> 
-</div> 
-<!-- Draw Names Card (Admin only) --> 
-<div class="draw-names-card" id="draw-names-card"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Gifts.png" alt="Gifts" class="draw-names-img"> 
-<div class="draw-names-top-bg"></div> 
-<h1>Let the Magic Begin!</h1> 
-<div class="draw-names-description">Don't forget to hit the button to<br>randomly pair everyone in the game.</div> 
-<button class="draw-names-btn" id="draw-names-btn">Draw Names</button> 
-</div> 
-<!-- Wishlist --> 
-<div class="participant-card wishlist-card"> 
-<h2> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowflake.png" class="wishlist-snowflake wishlist-snowflake-left"> 
-My Wishlist 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowflake.png" class="wishlist-snowflake wishlist-snowflake-right"> 
-</h2> 
-<div id="participant-wishlist-container"> 
-<!-- Wishlist items will be dynamically added here --> 
-</div> 
-<button class="button-green" id="view-wishlist-btn">View Wishlist</button> 
-</div> 
-</div> 
-</div> 
-</section> 
-<!-- ----------------- WISHLIST PAGE ----------------- --> 
-<section class="wishlist-page" id="wishlist-page"> 
-<!-- Decorations for wishlist page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="app-flake app-f1"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(1).png" class="app-flake app-f2"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(2).png" class="app-flake app-f3"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(3).png" class="app-flake app-f4"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework.png" class="app-fw app-fw1"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework%20(1).png" class="app-fw app-fw2"> 
-<!-- New presents image for wishlist page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="app-presents-img"> 
-<!-- New present image for wishlist page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/present.png" class="app-present-img"> 
-<!-- New snowglobe image for wishlist page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowglobe.png" class="app-snowglobe-img"> 
-<div class="wishlist-container"> 
-<!-- Decoration image in top left corner for wishlist page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="wishlist-decoration"> 
-<h1> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowflake.png" class="wishlist-snowflake wishlist-snowflake-left"> 
-My Wishlist 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowflake.png" class="wishlist-snowflake wishlist-snowflake-right"> 
-</h1> 
-<div class="wishlist-items" id="wishlist-page-items"> 
-<!-- Wishlist items will be dynamically added here --> 
-</div> 
-<button class="back-button" id="back-to-participant-btn">Back to Room</button> 
-</div> 
-</section> 
-<!-- ----------------- PERSONAL INFO PAGE ----------------- --> 
-<section class="personal-info-page" id="personal-info-page"> 
-<!-- Decorations for personal info page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="app-flake app-f1"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(1).png" class="app-flake app-f2"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(2).png" class="app-flake app-f3"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(3).png" class="app-flake app-f4"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework.png" class="app-fw app-fw1"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework%20(1).png" class="app-fw app-fw2"> 
-<!-- New presents image for personal info page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="app-presents-img"> 
-<!-- New present image for personal info page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/present.png" class="app-present-img"> 
-<!-- New snowglobe image for personal info page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowglobe.png" class="app-snowglobe-img"> 
-<div class="personal-info-container"> 
-<!-- Decoration image in top left corner for personal info page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/car.png" class="personal-info-decoration"> 
-<div class="close-btn" id="close-info-btn">✕</div> 
-<!-- Текст "Personal Information" переміщений після зображення --> 
-<h1>Personal Information</h1> 
-<p class="personal-info-subtitle">Secret Nick needs to know where to send your present!</p> 
-<div class="info-box"> 
-<div class="grid"> 
-<!-- Перший стовбчик переміщений ближче до лівого краю --> 
-<div style="margin-right: 20px;"> 
-<div class="label">First name</div> 
-<div class="value" id="info-first-name">Anastasiia</div> 
-</div> 
-<div> 
-<div class="label">Last name</div> 
-<div class="value" id="info-last-name">Petrenko</div> 
-</div> 
-<div style="margin-right: 20px;"> 
-<div class="label">Phone number</div> 
-<div class="value" id="info-phone">+38 099 876 54 32</div> 
-</div> 
-<div> 
-<div class="label">Email</div> 
-<div class="value" id="info-email">anastasiiapetrenko@gmail.com</div> 
-</div> 
-<div style="grid-column: 1 / 3;"> 
-<div class="label">Delivery address</div> 
-<div class="value" id="info-address">Kyiv, NP #212</div> 
-</div> 
-</div> 
-</div> 
-</div> 
-</section> 
-<!-- ----------------- LOOK WHO YOU GOT PAGE ----------------- --> 
-<section class="look-who-page" id="look-who-page"> 
-<!-- Decorations for look who page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="app-flake app-f1"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(1).png" class="app-flake app-f2"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(2).png" class="app-flake app-f3"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(3).png" class="app-flake app-f4"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework.png" class="app-fw app-fw1"> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework%20(1).png" class="app-fw app-fw2"> 
-<!-- New presents image for look who page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="app-presents-img"> 
-<!-- New present image for look who page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/present.png" class="app-present-img"> 
-<!-- New snowglobe image for look who page --> 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowglobe.png" class="app-snowglobe-img"> 
-<div class="look-who-header"> 
-Look Who You Got! 
-</div> 
-<div class="look-who-container"> 
-<div class="look-who-grid"> 
-<!-- PERSONAL INFORMATION --> 
-<div> 
-<h2>Personal Information</h2> 
-<div class="look-who-card-styled"> 
-<div class="snowflakes">❄️❄️</div> 
-<div class="field-title">First name</div> 
-<div class="field-value" id="look-who-first-name">Anastasiia</div> 
-<div class="field-title">Last name</div> 
-<div class="field-value" id="look-who-last-name">Petrenko</div> 
-<div class="field-title">Phone number</div> 
-<div class="field-value" id="look-who-phone">+38 099 876 54 32</div> 
-<div class="field-title">Email</div> 
-<div class="field-value" id="look-who-email">mariashevchenko@gmail.com</div> 
-<div class="field-title">Delivery address</div> 
-<div class="field-value" id="look-who-address">Kyiv, NP #212</div> 
-</div> 
-</div> 
-<!-- WISHLIST */ --> 
-<div> 
-<h2>Wishlist</h2> 
-<div class="wish-item-styled"> 
-<span>Candies</span> 
-<a href="https://himopt.com.ua/ua/shokoladnie-konfeti-ferrero-rocher-16-shtuk-200-g.html" target="_blank" class="link">Link</a> 
-</div> 
-<div class="wish-item-styled"> 
-<span>Christmass Candle</span> 
-</div> 
-<div class="wish-item-styled"> 
-<span>Harry Potter books</span> 
-<a href="https://www.britishbook.ua/detail/harry-potter-and-the-philosopher-s-stone_3/?gad_source=4&gad_campaignid=20286857922&gbraid=0AAAAApy32kXaVIiMyvc0suCTWI0niNU7e&gclid=CjwKCAiAz_DIBhBJEiwAVH2XwEFA1_aSvs5EpDIW9r3R-szJSS2F1-PBlA367RkgqUxIJotBsUSOGxoCP1MQAvD_BwE" target="_blank" class="link">Link</a> 
-</div> 
-<div class="wish-item-styled"> 
-<span>Chocolate Bar</span> 
-</div> 
-<div class="wish-item-styled"> 
-<span>Puppy with little brown eyes and funny tail</span> 
-<a href="https://antoshka.ua/uk/pesik-chi-chi-love-pi-pi-pappi-5893460.html" target="_blank" class="link">Link</a> 
-</div> 
-</div> 
-</div> 
-<button class="btn" id="back-to-participant-from-look-who">Go Back to Room</button> 
-</div> 
-</section> 
-<!-- ----------------- NEW FOOTER (ADDED) ------------------ --> 
-<footer class="main-footer"> 
-<div class="footer-left">© 2025 EPAM Systems. All rights reserved.</div> 
-<div class="footer-right">Privacy Policy Privacy Notice</div> 
-</footer> 
-<script> 
-// Store the gift budget from step 1 
-let giftBudgetValue = 0; 
-let wishItemCount = 1; 
-// Store wishlist data 
-let wishlistData = []; 
-// Store personal info data 
-let personalInfoData = {}; 
-// List of players from Who's Playing section (excluding current user and admin) 
-const playersList = [ 
-"Kostiantyna Nechyporenko", 
-"Mykyta Slivchuk", 
-"Kateryna Moravska", 
-"Ivan Moldvinenko", 
-"Serhii Kovalenko", 
-"Valeria Solominka", 
-"Veronica Andriyenko", 
-"Ivan Kolodii" 
-]; 
-// Variables for delete confirmation modal 
-let currentDeletePlayerRow = null; 
-let currentDeletePlayerName = ''; 
-// Global variable to track admin status 
-let isAdmin = false; 
-// Function to show Look Who You Got card after 5 seconds 
-function showLookWhoCard() { 
-setTimeout(function() { 
-// Select a random player from the list 
-const randomIndex = Math.floor(Math.random() * playersList.length); 
-const assignedName = playersList[randomIndex]; 
-// Update the name in the card 
-document.getElementById('look-who-name').textContent = assignedName; 
-// Show the card 
-document.getElementById('look-who-card').style.display = 'block'; 
-}, 5000); 
-} 
-// Look Who You Got button handler 
-document.getElementById('look-who-btn').addEventListener('click', function() { 
-// Get the assigned person's name 
-const assignedName = document.getElementById('look-who-name').textContent; 
-// Update the look who page with the assigned person's name 
-document.getElementById('look-who-first-name').textContent = assignedName.split(' ')[0]; 
-document.getElementById('look-who-last-name').textContent = assignedName.split(' ')[1]; 
-// Hide current pages and show look who page 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'none'; 
-document.getElementById('wishlist-page').style.display = 'none'; 
-document.getElementById('personal-info-page').style.display = 'none'; 
-document.getElementById('look-who-page').style.display = 'block'; 
-// Update URL 
-history.pushState(null, null, '#look-who'); 
-}); 
-// Back button handler from look who page 
-document.getElementById('back-to-participant-from-look-who').addEventListener('click', function() { 
-// Hide look who page and show participant page 
-document.getElementById('look-who-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'block'; 
-// Update URL 
-history.pushState(null, null, '#participant'); 
-// Show Look Who You Got card after 5 seconds 
-showLookWhoCard(); 
-}); 
-// Admin toggle functionality 
-document.getElementById('admin-toggle').addEventListener('click', function() { 
-const adminToggleCircle = document.getElementById('admin-toggle-circle'); 
-const adminPasswordSection = document.getElementById('admin-password-section'); 
-if (adminToggleCircle.classList.contains('active')) { 
-adminToggleCircle.classList.remove('active'); 
-adminPasswordSection.classList.remove('active'); 
-} else { 
-adminToggleCircle.classList.add('active'); 
-adminPasswordSection.classList.add('active'); 
-} 
-}); 
-// Admin password submit functionality 
-document.getElementById('admin-password-btn').addEventListener('click', function() { 
-const adminPassword = document.getElementById('admin-password').value; 
-const adminPasswordError = document.getElementById('admin-password-error'); 
-if (adminPassword === '1111') { 
-// Password is correct - navigate to participant page as admin 
-isAdmin = true; 
-transferDataToParticipantPage(); 
-navigateToParticipantPageAsAdmin(); 
-} else { 
-// Password is incorrect - show error 
-adminPasswordError.style.display = 'block'; 
-} 
-}); 
-// Function to transfer data to participant page 
-function transferDataToParticipantPage() { 
-// Transfer data to participant page 
-const firstName = document.getElementById('first-name').value || 'Maria'; 
-const lastName = document.getElementById('last-name').value || 'Shevchenko'; 
-const exchangeDate = document.getElementById('exchange-date').value; 
-const giftBudget = document.getElementById('gift-budget').value || '1000'; 
-const personalLink = document.getElementById('personal-link').value; 
-// Format date for display 
-let displayDate = '06 Dec 2025'; 
-if (exchangeDate) { 
-const dateObj = new Date(exchangeDate); 
-displayDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); 
-} 
-// Update participant page with data 
-document.getElementById('participant-name').textContent = firstName; 
-document.getElementById('participant-exchange-date').textContent = displayDate; 
-document.getElementById('participant-gift-budget').textContent = giftBudget + ' UAH'; 
-document.getElementById('participant-personal-link').value = personalLink; 
-// Update participant wishlist with collected data 
-updateParticipantWishlist(); 
-// Update Who's Playing section for admin 
-updateWhosPlayingForAdmin(firstName + ' ' + lastName); 
-} 
-// Function to update Who's Playing section for admin (remove "Admin" label from Anastasiia Petrenko) 
-function updateWhosPlayingForAdmin(fullName) { 
-const currentUserRow = document.getElementById('current-user-row'); 
-// Remove "You" label and keep only "Admin" 
-currentUserRow.innerHTML = `${fullName} <span class="admin-label">Admin</span>`; 
-// Remove "Admin" label from Anastasiia Petrenko 
-const playersRows = document.querySelectorAll('.player-row'); 
-playersRows[0].innerHTML = 'Anastasiia Petrenko'; 
-// Show delete buttons for admin 
-document.querySelectorAll('.admin-only').forEach(btn => { 
-btn.style.display = 'block'; 
-}); 
-} 
-// Function to navigate to participant page as admin 
-function navigateToParticipantPageAsAdmin() { 
-// Hide current pages and show participant page 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'block'; 
-document.getElementById('wishlist-page').style.display = 'none'; 
-document.getElementById('personal-info-page').style.display = 'none'; 
-document.getElementById('look-who-page').style.display = 'none'; 
-// Update URL 
-history.pushState(null, null, '#participant'); 
-// Hide Look Who You Got card and show Draw Names card for admin 
-document.getElementById('look-who-card').style.display = 'none'; 
-document.getElementById('draw-names-card').style.display = 'block'; 
-} 
-// Function to navigate to participant page as regular user 
-function navigateToParticipantPageAsUser() { 
-// Hide current pages and show participant page 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'block'; 
-document.getElementById('wishlist-page').style.display = 'none'; 
-document.getElementById('personal-info-page').style.display = 'none'; 
-document.getElementById('look-who-page').style.display = 'none'; 
-// Update URL 
-history.pushState(null, null, '#participant'); 
-// Show Look Who You Got card after 5 seconds for regular user 
-showLookWhoCard(); 
-// Ensure Draw Names card is hidden for regular user 
-document.getElementById('draw-names-card').style.display = 'none'; 
-// Hide delete buttons for regular user 
-document.querySelectorAll('.admin-only').forEach(btn => { 
-btn.style.display = 'none'; 
-}); 
-} 
-// Draw Names button handler 
-document.getElementById('draw-names-btn').addEventListener('click', function() { 
-// Select a random player from the list 
-const randomIndex = Math.floor(Math.random() * playersList.length); 
-const assignedName = playersList[randomIndex]; 
-// Update the name in the Look Who You Got card 
-document.getElementById('look-who-name').textContent = assignedName; 
-// Hide the Draw Names card and show the Look Who You Got card 
-document.getElementById('draw-names-card').style.display = 'none'; 
-document.getElementById('look-who-card').style.display = 'block'; 
-}); 
-// Delete player functionality with confirmation modal 
-document.addEventListener('click', function(e) { 
-if (e.target.classList.contains('delete-btn') && isAdmin) { 
-currentDeletePlayerRow = e.target.closest('.player-row'); 
-currentDeletePlayerName = currentDeletePlayerRow.getAttribute('data-player'); 
-// Show confirmation modal 
-document.getElementById('delete-modal').style.display = 'flex'; 
-} 
-}); 
-// Delete confirmation modal buttons 
-document.getElementById('delete-yes-btn').addEventListener('click', function() { 
-// Remove the player row 
-if (currentDeletePlayerRow) { 
-currentDeletePlayerRow.remove(); 
-// Update players count 
-updatePlayersCount(); 
-} 
-// Close the modal 
-document.getElementById('delete-modal').style.display = 'none'; 
-}); 
-document.getElementById('delete-no-btn').addEventListener('click', function() { 
-// Close the modal without deleting 
-document.getElementById('delete-modal').style.display = 'none'; 
-}); 
-// Function to update players count 
-function updatePlayersCount() { 
-const playerRows = document.querySelectorAll('.player-row'); 
-const countElement = document.getElementById('players-count'); 
-if (countElement) { 
-countElement.textContent = `${playerRows.length}/20`; 
-} 
-} 
-document.getElementById('create-room-btn').addEventListener('click', function(e) { 
-e.preventDefault(); 
-// Hide landing page 
-document.getElementById('landing').style.display = 'none'; 
-// Show app page 
-document.getElementById('app-page').style.display = 'block'; 
-// Update URL without reloading page 
-history.pushState(null, null, '#app'); 
-}); 
-// Handle browser back/forward buttons 
-window.addEventListener('popstate', function() { 
-if (window.location.hash === '#app') { 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'block'; 
-document.getElementById('participant-page').style.display = 'none'; 
-document.getElementById('wishlist-page').style.display = 'none'; 
-document.getElementById('personal-info-page').style.display = 'none'; 
-document.getElementById('look-who-page').style.display = 'none'; 
-} else if (window.location.hash === '#participant') { 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'block'; 
-document.getElementById('wishlist-page').style.display = 'none'; 
-document.getElementById('personal-info-page').style.display = 'none'; 
-document.getElementById('look-who-page').style.display = 'none'; 
-// Show Look Who You Got card after 5 seconds on participant page for regular users 
-showLookWhoCard(); 
-} else if (window.location.hash === '#wishlist') { 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'none'; 
-document.getElementById('wishlist-page').style.display = 'block'; 
-document.getElementById('personal-info-page').style.display = 'none'; 
-document.getElementById('look-who-page').style.display = 'none'; 
-} else if (window.location.hash === '#personal-info') { 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'none'; 
-document.getElementById('wishlist-page').style.display = 'none'; 
-document.getElementById('personal-info-page').style.display = 'block'; 
-document.getElementById('look-who-page').style.display = 'none'; 
-} else if (window.location.hash === '#look-who') { 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'none'; 
-document.getElementById('wishlist-page').style.display = 'none'; 
-document.getElementById('personal-info-page').style.display = 'none'; 
-document.getElementById('look-who-page').style.display = 'block'; 
-} else { 
-document.getElementById('landing').style.display = 'block'; 
-document.getElementById('app-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'none'; 
-document.getElementById('wishlist-page').style.display = 'none'; 
-document.getElementById('personal-info-page').style.display = 'none'; 
-document.getElementById('look-who-page').style.display = 'none'; 
-} 
-}); 
-// Check URL on page load 
-if (window.location.hash === '#app') { 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'block'; 
-} else if (window.location.hash === '#participant') { 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'block'; 
-// Show Look Who You Got card after 5 seconds on participant page 
-showLookWhoCard(); 
-} else if (window.location.hash === '#wishlist') { 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'none'; 
-document.getElementById('wishlist-page').style.display = 'block'; 
-document.getElementById('personal-info-page').style.display = 'none'; 
-document.getElementById('look-who-page').style.display = 'none'; 
-} else if (window.location.hash === '#personal-info') { 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'none'; 
-document.getElementById('wishlist-page').style.display = 'none'; 
-document.getElementById('personal-info-page').style.display = 'block'; 
-document.getElementById('look-who-page').style.display = 'none'; 
-} else if (window.location.hash === '#look-who') { 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'none'; 
-document.getElementById('wishlist-page').style.display = 'none'; 
-document.getElementById('personal-info-page').style.display = 'none'; 
-document.getElementById('look-who-page').style.display = 'block'; 
-} 
-// Form validation and button activation for step 1 
-const roomNameInput = document.getElementById('room-name'); 
-const roomDescriptionInput = document.getElementById('room-description'); 
-const exchangeDateInput = document.getElementById('exchange-date'); 
-const giftBudgetInput = document.getElementById('gift-budget'); 
-const continueBtn = document.getElementById('continue-btn'); 
-function checkFormValidity() { 
-const isRoomNameFilled = roomNameInput.value.trim() !== ''; 
-const isRoomDescriptionFilled = roomDescriptionInput.value.trim() !== ''; 
-const isExchangeDateFilled = exchangeDateInput.value !== ''; 
-const isGiftBudgetFilled = giftBudgetInput.value !== ''; 
-if (isRoomNameFilled && isRoomDescriptionFilled && isExchangeDateFilled && isGiftBudgetFilled) { 
-continueBtn.classList.add('active'); 
-} else { 
-continueBtn.classList.remove('active'); 
-} 
-} 
-// Add event listeners to all form inputs for step 1 
-roomNameInput.addEventListener('input', checkFormValidity); 
-roomDescriptionInput.addEventListener('input', checkFormValidity); 
-exchangeDateInput.addEventListener('input', checkFormValidity); 
-giftBudgetInput.addEventListener('input', checkFormValidity); 
-// Continue button click handler for step 1 
-continueBtn.addEventListener('click', function() { 
-if (this.classList.contains('active')) { 
-// Store the gift budget value 
-giftBudgetValue = giftBudgetInput.value; 
-// Hide step 1 content 
-document.getElementById('step1-content').style.display = 'none'; 
-// Show step 2 content 
-document.getElementById('step2-content').style.display = 'block'; 
-// Update progress steps 
-document.getElementById('step1').classList.remove('active'); 
-document.getElementById('step2').classList.add('active'); 
-} 
-}); 
-// Form validation for step 2 
-const firstNameInput = document.getElementById('first-name'); 
-const lastNameInput = document.getElementById('last-name'); 
-const phoneInput = document.getElementById('phone'); 
-const addressInput = document.getElementById('address'); 
-const continueBtnStep2 = document.getElementById('continue-btn-step2'); 
-function checkStep2FormValidity() { 
-const isFirstNameFilled = firstNameInput.value.trim() !== ''; 
-const isLastNameFilled = lastNameInput.value.trim() !== ''; 
-const isPhoneFilled = phoneInput.value.trim() !== ''; 
-const isAddressFilled = addressInput.value.trim() !== ''; 
-if (isFirstNameFilled && isLastNameFilled && isPhoneFilled && isAddressFilled) { 
-continueBtnStep2.classList.add('active'); 
-} else { 
-continueBtnStep2.classList.remove('active'); 
-} 
-} 
-// Add event listeners for step 2 inputs 
-firstNameInput.addEventListener('input', checkStep2FormValidity); 
-lastNameInput.addEventListener('input', checkStep2FormValidity); 
-phoneInput.addEventListener('input', checkStep2FormValidity); 
-addressInput.addEventListener('input', checkStep2FormValidity); 
-// Continue button handler for step 2 
-continueBtnStep2.addEventListener('click', function() { 
-if (this.classList.contains('active')) { 
-// Update gift budget display 
-const budgetDisplay = giftBudgetValue === '0' ? 'Unlimited' : giftBudgetValue + ' UAH'; 
-document.getElementById('gift-budget-display').innerHTML = ` 
-<img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="gift-budget-icon"> 
-Gift Budget: <strong>${budgetDisplay}</strong> 
-`; 
-// Hide step 2 content 
-document.getElementById('step2-content').style.display = 'none'; 
-// Show step 3 content 
-document.getElementById('step3-content').style.display = 'block'; 
-// Update progress steps 
-document.getElementById('step2').classList.remove('active'); 
-document.getElementById('step3').classList.add('active'); 
-} 
-}); 
-// Add Wish functionality 
-document.getElementById('add-wish-btn').addEventListener('click', function() { 
-if (wishItemCount < 5) { 
-wishItemCount++; 
-const newWishItem = document.createElement('div'); 
-newWishItem.className = 'wish-item'; 
-newWishItem.id = 'wish-item-' + wishItemCount; 
-newWishItem.innerHTML = ` 
-<div class="row"> 
-<div class="half"> 
-<label>I wish for *</label> 
-<input type="text" class="input wish-item-input" placeholder="Enter your wish name" maxlength="40"> 
-<div class="count">0 / 40</div> 
-</div> 
-<div class="half"> 
-<label>Add link</label> 
-<input type="url" class="input wish-link-input" placeholder="E.g. https://example.com/item"> 
-</div> 
-</div> 
-`; 
-document.getElementById('wish-items-container').appendChild(newWishItem); 
-// Add character count functionality to new input 
-const newInput = newWishItem.querySelector('.wish-item-input'); 
-const newCount = newWishItem.querySelector('.count'); 
-newInput.addEventListener('input', function() { 
-newCount.textContent = this.value.length + ' / 40'; 
-}); 
-// Add validation listener 
-newInput.addEventListener('input', checkStep3FormValidity); 
-// Disable button if reached max 
-if (wishItemCount >= 5) { 
-this.disabled = true; 
-} 
-} 
-}); 
-// Character count for first wish item 
-document.querySelector('.wish-item-input').addEventListener('input', function() { 
-const countElement = this.parentElement.querySelector('.count'); 
-countElement.textContent = this.value.length + ' / 40'; 
-}); 
-// Form validation for step 3 
-const completeBtn = document.getElementById('complete-btn'); 
-function checkStep3FormValidity() { 
-const isWishIdeasSelected = document.getElementById('wish-ideas').checked; 
-const isSurpriseSelected = document.getElementById('surprise-gift').checked; 
-if (isSurpriseSelected) { 
-completeBtn.classList.add('active'); 
-return; 
-} 
-if (isWishIdeasSelected) { 
-// Check if at least one wish item is filled 
-const wishInputs = document.querySelectorAll('.wish-item-input'); 
-let hasFilledWish = false; 
-wishInputs.forEach(input => { 
-if (input.value.trim() !== '') { 
-hasFilledWish = true; 
-} 
-}); 
-if (hasFilledWish) { 
-completeBtn.classList.add('active'); 
-} else { 
-completeBtn.classList.remove('active'); 
-} 
-} else { 
-completeBtn.classList.remove('active'); 
-} 
-} 
-// Add event listeners for step 3 inputs 
-document.querySelector('.wish-item-input').addEventListener('input', checkStep3FormValidity); 
-document.getElementById('wish-ideas').addEventListener('change', checkStep3FormValidity); 
-document.getElementById('surprise-gift').addEventListener('change', checkStep3FormValidity); 
-// Function to collect wishlist data 
-function collectWishlistData() { 
-wishlistData = []; 
-const wishItems = document.querySelectorAll('.wish-item'); 
-wishItems.forEach((item, index) => { 
-const wishName = item.querySelector('.wish-item-input').value.trim(); 
-const wishLink = item.querySelector('.wish-link-input').value.trim(); 
-if (wishName) { 
-wishlistData.push({ 
-name: wishName, 
-link: wishLink 
-}); 
-} 
-}); 
-} 
-// Function to collect personal info data 
-function collectPersonalInfoData() { 
-personalInfoData = { 
-firstName: document.getElementById('first-name').value || 'Anastasiia', 
-lastName: document.getElementById('last-name').value || 'Petrenko', 
-phone: document.getElementById('phone').value ? '+38 0' + document.getElementById('phone').value.replace(/\D/g, '').replace(/(\d{2})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4') : '+38 099 876 54 32', 
-email: document.getElementById('email').value || 'anastasiiapetrenko@gmail.com', 
-address: document.getElementById('address').value || 'Kyiv, NP #212' 
-}; 
-} 
-// Function to update participant wishlist 
-function updateParticipantWishlist() { 
-const wishlistContainer = document.getElementById('participant-wishlist-container'); 
-wishlistContainer.innerHTML = ''; 
-if (wishlistData.length === 0) { 
-wishlistContainer.innerHTML = '<div class="wish-row">No wishes added yet</div>'; 
-return; 
-} 
-wishlistData.forEach((wish, index) => { 
-const wishRow = document.createElement('div'); 
-wishRow.className = 'wish-row'; 
-const displayName = wish.name.length > 30 ? wish.name.substring(0, 30) + '...' : wish.name; 
-wishRow.innerHTML = ` 
-${displayName} 
-<span class="wish-link" data-link="${wish.link}" data-index="${index}">Link</span> 
-`; 
-wishlistContainer.appendChild(wishRow); 
-}); 
-// Add click event listeners to wish links 
-document.querySelectorAll('.wish-link[data-link]').forEach(link => { 
-link.addEventListener('click', function() { 
-const wishLink = this.getAttribute('data-link'); 
-if (wishLink) { 
-window.open(wishLink, '_blank'); 
-} else { 
-alert('No link available for this wish'); 
-} 
-}); 
-}); 
-} 
-// Function to update personal info page 
-function updatePersonalInfoPage() { 
-document.getElementById('info-first-name').textContent = personalInfoData.firstName; 
-document.getElementById('info-last-name').textContent = personalInfoData.lastName; 
-document.getElementById('info-phone').textContent = personalInfoData.phone; 
-document.getElementById('info-email').textContent = personalInfoData.email; 
-document.getElementById('info-address').textContent = personalInfoData.address; 
-} 
-// Function to update wishlist page 
-function updateWishlistPage() { 
-const wishlistPageContainer = document.getElementById('wishlist-page-items'); 
-wishlistPageContainer.innerHTML = ''; 
-if (wishlistData.length === 0) { 
-wishlistPageContainer.innerHTML = '<div class="wishlist-item"><h3>No wishes added yet</h3></div>'; 
-return; 
-} 
-wishlistData.forEach((wish, index) => { 
-const wishlistItem = document.createElement('div'); 
-wishlistItem.className = 'wishlist-item'; 
-wishlistItem.innerHTML = ` 
-<h3>${wish.name}</h3> 
-${wish.link ? `<a href="${wish.link}" target="_blank" class="wishlist-item-link">View Product Link</a>` : '<p>No link provided</p>'} 
-`; 
-wishlistPageContainer.appendChild(wishlistItem); 
-}); 
-} 
-// Function to update current user name in Who's Playing section 
-function updateCurrentUserName() { 
-const firstName = document.getElementById('first-name').value || 'Maria'; 
-const lastName = document.getElementById('last-name').value || 'Shevchenko'; 
-const currentUserRow = document.getElementById('current-user-row'); 
-currentUserRow.innerHTML = `${firstName} ${lastName} <span class="you-label">You</span>`; 
-document.getElementById('participant-name').textContent = firstName; 
-} 
-// Complete button handler for step 3 
-completeBtn.addEventListener('click', function() { 
-if (this.classList.contains('active')) { 
-// Collect wishlist data 
-collectWishlistData(); 
-// Collect personal info data 
-collectPersonalInfoData(); 
-// Update current user name 
-updateCurrentUserName(); 
-// Generate unique room code 
-const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase(); 
-const personalCode = Math.random().toString(36).substring(2, 10).toUpperCase(); 
-// Update links with generated codes 
-document.getElementById('room-link').value = `https://secretnickswap.com/join/${roomCode}`; 
-document.getElementById('personal-link').value = `https://secretnickswap.com/join/${personalCode}`; 
-// Update invitation note with actual room link 
-const noteBox = document.querySelector('.note-box'); 
-noteBox.innerHTML = noteBox.innerHTML.replace('abc123', roomCode); 
-// Hide step 3 content 
-document.getElementById('step3-content').style.display = 'none'; 
-// Show step 4 content 
-document.getElementById('step4-content').style.display = 'block'; 
-// Hide progress steps on step 4 
-document.getElementById('progress-steps').style.display = 'none'; 
-} 
-}); 
-// Visit Room button handler - opens participant page 
-document.getElementById('visit-room-btn').addEventListener('click', function() { 
-transferDataToParticipantPage(); 
-navigateToParticipantPageAsUser(); 
-}); 
-// View Information button handler - opens personal info page 
-document.getElementById('view-info-btn').addEventListener('click', function() { 
-// Update personal info page with collected data 
-updatePersonalInfoPage(); 
-// Hide current pages and show personal info page 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'none'; 
-document.getElementById('wishlist-page').style.display = 'none'; 
-document.getElementById('personal-info-page').style.display = 'block'; 
-document.getElementById('look-who-page').style.display = 'none'; 
-// Update URL 
-history.pushState(null, null, '#personal-info'); 
-}); 
-// View Wishlist button handler - opens wishlist page 
-document.getElementById('view-wishlist-btn').addEventListener('click', function() { 
-// Update wishlist page with collected data 
-updateWishlistPage(); 
-// Hide current pages and show wishlist page 
-document.getElementById('landing').style.display = 'none'; 
-document.getElementById('app-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'none'; 
-document.getElementById('wishlist-page').style.display = 'block'; 
-document.getElementById('personal-info-page').style.display = 'none'; 
-document.getElementById('look-who-page').style.display = 'none'; 
-// Update URL 
-history.pushState(null, null, '#wishlist'); 
-}); 
-// Back to Participant button handler from wishlist 
-document.getElementById('back-to-participant-btn').addEventListener('click', function() { 
-// Hide wishlist page and show participant page 
-document.getElementById('wishlist-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'block'; 
-// Update URL 
-history.pushState(null, null, '#participant'); 
-// Show Look Who You Got card after 5 seconds 
-showLookWhoCard(); 
-}); 
-// Close button handler for personal info page 
-document.getElementById('close-info-btn').addEventListener('click', function() { 
-// Hide personal info page and show participant page 
-document.getElementById('personal-info-page').style.display = 'none'; 
-document.getElementById('participant-page').style.display = 'block'; 
-// Update URL 
-history.pushState(null, null, '#participant'); 
-// Show Look Who You Got card after 5 seconds 
-showLookWhoCard(); 
-}); 
-// Copy button functionality 
-document.addEventListener('click', function(e) { 
-if (e.target.closest('.copy-btn')) { 
-const copyBtn = e.target.closest('.copy-btn'); 
-const targetId = copyBtn.getAttribute('data-target'); 
-const input = document.getElementById(targetId); 
-// Select the text 
-input.select(); 
-input.setSelectionRange(0, 99999); // For mobile devices 
-// Copy the text 
-navigator.clipboard.writeText(input.value).then(function() { 
-// Show success feedback 
-const originalHTML = copyBtn.innerHTML; 
-copyBtn.classList.add('copied'); 
-copyBtn.innerHTML = ` 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#2C5134"> 
-<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/> 
-</svg> 
-<span class="copy-tooltip">Copy to clipboard</span> 
-`; 
-// Reset after 2 seconds 
-setTimeout(function() { 
-copyBtn.classList.remove('copied'); 
-copyBtn.innerHTML = originalHTML; 
-}, 2000); 
-}).catch(function(err) { 
-console.error('Failed to copy text: ', err); 
-// Fallback for older browsers 
-try { 
-document.execCommand('copy'); 
-const originalHTML = copyBtn.innerHTML; 
-copyBtn.classList.add('copied'); 
-copyBtn.innerHTML = ` 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#2C5134"> 
-<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/> 
-</svg> 
-<span class="copy-tooltip">Copy to clipboard</span> 
-`; 
-setTimeout(function() { 
-copyBtn.classList.remove('copied'); 
-copyBtn.innerHTML = originalHTML; 
-}, 2000); 
-} catch (fallbackErr) { 
-console.error('Fallback copy failed: ', fallbackErr); 
-alert('Failed to copy text to clipboard'); 
-} 
-}); 
-} 
-}); 
-// Back button handlers 
-document.getElementById('back-link-step2').addEventListener('click', function(e) { 
-e.preventDefault(); 
-// Hide step 2 content 
-document.getElementById('step2-content').style.display = 'none'; 
-// Show step 1 content 
-document.getElementById('step1-content').style.display = 'block'; 
-// Update progress steps 
-document.getElementById('step2').classList.remove('active'); 
-document.getElementById('step1').classList.add('active'); 
-}); 
-document.getElementById('back-link-step3').addEventListener('click', function(e) { 
-e.preventDefault(); 
-// Hide step 3 content 
-document.getElementById('step3-content').style.display = 'none'; 
-// Show step 2 content 
-document.getElementById('step2-content').style.display = 'block'; 
-// Update progress steps 
-document.getElementById('step3').classList.remove('active'); 
-document.getElementById('step2').classList.add('active'); 
-}); 
-</script> 
-</body> 
+    <!-- HEADER -->
+    <header class="main-header">
+        <div class="logo">
+            <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Logo%20(1).png" alt="Logo" width="187" height="28">
+        </div>
+    </header>
+
+    <!-- LANDING PAGE -->
+    <section class="landing-wrapper" id="landing">
+        <!-- Decorations -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="flake f1">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(1).png" class="flake f2">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(2).png" class="flake f3">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(3).png" class="flake f4">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework.png" class="fw fw1">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework%20(1).png" class="fw fw2">
+        <!-- New presents image -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="presents-img">
+        <!-- New present image -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/present.png" class="present-img">
+        <!-- New snowglobe image -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowglobe.png" class="snowglobe-img">
+        <!-- Floating feature cards -->
+        <div class="float-card fc1"><img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Christmas%20Icons.png"> Have fun</div>
+        <div class="float-card fc2"><img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Christmas%20Icons%20(1).png"> Match people</div>
+        <div class="float-card fc3"><img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Christmas%20Icons%20(2).png"> Share wishes</div>
+        <div class="float-card fc4"><img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Christmas%20Icons%20(3).png"> Give presents</div>
+        <h1>Make This Holiday Magical<br>with Secret Nick</h1>
+        <p>
+            It's a secret — don't tell who you're matched with!<br>
+            Use the wishlist or preferences to pick the perfect gift.<br>
+            Be ready for the big gift exchange!
+        </p>
+        <a href="#" class="landing-btn" id="create-room-btn">Create Your Room</a>
+    </section>
+
+    <!-- APP PAGE -->
+    <section class="app-page" id="app-page">
+        <!-- Decorations for app page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="app-flake app-f1">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(1).png" class="app-flake app-f2">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(2).png" class="app-flake app-f3">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(3).png" class="app-flake app-f4">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework.png" class="app-fw app-fw1">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework%20(1).png" class="app-fw app-fw2">
+        <!-- New presents image for app page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="app-presents-img">
+        <!-- New present image for app page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/present.png" class="app-present-img">
+        <!-- New snowglobe image for app page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowglobe.png" class="app-snowglobe-img">
+        <!-- Progress Steps -->
+        <div class="progress-steps" id="progress-steps">
+            <div class="step active" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-text">Create room</div>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-text">Add personal info</div>
+            </div>
+            <div class="step" id="step3">
+                <div class="step-number">3</div>
+                <div class="step-text">Add wishlist</div>
+            </div>
+        </div>
+        <div class="wrapper" id="form-wrapper">
+            <!-- Decoration image in top right corner for step 1 -->
+            <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="wrapper-decoration" id="step1-decoration">
+            <!-- Step 1 Content -->
+            <div id="step1-content">
+                <h1>Create Your Secret Nick Room</h1>
+                <p class="subtitle">Let the holiday magic begin! Set up your gift exchange in just a few steps.</p>
+                <!-- ROOM NAME -->
+                <label>Room name *</label>
+                <input type="text" class="input" id="room-name" placeholder="Enter your room name">
+                <!-- ROOM DESCRIPTION -->
+                <label style="margin-top:20px;">Room description *</label>
+                <textarea class="textarea" id="room-description" placeholder="Enter your message here..."></textarea>
+                <!-- DATE & BUDGET -->
+                <div class="row">
+                    <div class="half">
+                        <label>Gift Exchange date *</label>
+                        <input type="date" class="date-input" id="exchange-date">
+                    </div>
+                    <div class="half">
+                        <label>Gift budget *</label>
+                        <div class="budget-wrapper">
+                            <input type="number" class="budget-input" id="gift-budget" placeholder="Type in your budget">
+                            <div class="currency-tag">UAH</div>
+                        </div>
+                        <small style="color:#777;">0 means unlimited budget</small>
+                    </div>
+                </div>
+                <!-- BUTTON -->
+                <button class="continue-btn" id="continue-btn">Continue</button>
+            </div>
+            <!-- Step 2 Content -->
+            <div id="step2-content" style="display: none;">
+                <!-- Decoration image in top right corner for step 2 -->
+                <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/car.png" class="wrapper-decoration" id="step2-decoration">
+                <h1>Add Your Details</h1>
+                <p class="subtitle">Secret Nick needs to know where to send your present!</p>
+                <!-- NAME FIELDS -->
+                <div class="row">
+                    <div class="half">
+                        <label>First name *</label>
+                        <input type="text" class="input" id="first-name" placeholder="e.g. Nickolas">
+                    </div>
+                    <div class="half">
+                        <label>Last name *</label>
+                        <input type="text" class="input" id="last-name" placeholder="e.g. Secret">
+                    </div>
+                </div>
+                <!-- PHONE + EMAIL -->
+                <div class="row" style="margin-top:25px;">
+                    <div class="half">
+                        <label>Phone number *</label>
+                        <div class="phone-wrapper">
+                            <div class="phone-prefix">+380</div>
+                            <input type="text" class="input" id="phone" placeholder="77 777 77 77">
+                        </div>
+                    </div>
+                    <div class="half">
+                        <label>Email</label>
+                        <input type="email" class="input" id="email" placeholder="nickolas@example.com">
+                    </div>
+                </div>
+                <!-- ADDRESS -->
+                <label style="margin-top:25px;">Your delivery address (no North Pole required!) *</label>
+                <textarea class="textarea" id="address" placeholder="Where should St. Nick deliver your gift?"></textarea>
+                <!-- BUTTON -->
+                <button class="continue-btn" id="continue-btn-step2">Continue</button>
+                <!-- BACK -->
+                <a href="#" class="back-link" id="back-link-step2">← Back to the previous step</a>
+            </div>
+            <!-- Step 3 Content -->
+            <div id="step3-content" style="display: none;">
+                <!-- Decoration image in top right corner for step 3 -->
+                <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="wrapper-decoration" id="step3-decoration">
+                <h1>Add Your Wishes</h1>
+                <p class="subtitle">Let your Secret Nick know what would make you smile this season.</p>
+                <div class="gift-budget" id="gift-budget-display">
+                    <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="gift-budget-icon">
+                    Gift Budget: <strong>0 UAH</strong>
+                </div>
+                <!-- Wish Option 1 -->
+                <div class="section">
+                    <div class="section-title">
+                        <input type="radio" name="wishType" checked id="wish-ideas">
+                        <label for="wish-ideas">I have gift ideas! (add up to 5 gift ideas)</label>
+                    </div>
+                    <div id="wish-items-container">
+                        <!-- First wish item -->
+                        <div class="wish-item" id="wish-item-1">
+                            <div class="row">
+                                <div class="half">
+                                    <label>I wish for *</label>
+                                    <input type="text" class="input wish-item-input" placeholder="Enter your wish name" maxlength="40">
+                                    <div class="count">0 / 40</div>
+                                </div>
+                                <div class="half">
+                                    <label>Add link</label>
+                                    <input type="url" class="input wish-link-input" placeholder="E.g. https://example.com/item">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="add-btn" id="add-wish-btn">+ Add Wish</button>
+                </div>
+                <!-- Wish Option 2 -->
+                <div class="option-box">
+                    <label>
+                        <input type="radio" name="wishType" id="surprise-gift">
+                        I want a surprise gift
+                    </label>
+                </div>
+                <!-- Button -->
+                <button class="complete-btn" id="complete-btn">Complete</button>
+                <!-- Back -->
+                <a href="#" class="back-link" id="back-link-step3">← Back to the previous step</a>
+            </div>
+            <!-- Step 4 Content -->
+            <div id="step4-content" style="display: none;">
+                <!-- Decoration image in top right corner for step 4 -->
+                <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/wreath.png" class="wrapper-decoration" id="step4-decoration">
+                <h1>Your Secret Nick Room is Ready!</h1>
+                <p>Share the link below with up to 20 friends to invite them — and don't lose your personal link! Let the festive magic begin!</p>
+                <!-- Admin Toggle -->
+                <div class="admin-toggle" id="admin-toggle">
+                    <div class="admin-toggle-circle" id="admin-toggle-circle"></div>
+                    <div class="admin-toggle-text">I am admin</div>
+                </div>
+                <!-- Admin Password Section -->
+                <div class="admin-password-section" id="admin-password-section">
+                    <label>Enter admin password:</label>
+                    <input type="password" class="admin-password-input" id="admin-password" placeholder="Enter password">
+                    <button class="admin-password-btn" id="admin-password-btn">Submit</button>
+                    <div class="admin-password-error" id="admin-password-error">Incorrect password. Please try again.</div>
+                </div>
+                <!-- Room Link -->
+                <div class="section">
+                    <label>Your Room Link</label>
+                    <div class="copy-input-wrapper">
+                        <input type="text" class="input" id="room-link" value="https://secretnickswap.com/join/abc123" readonly>
+                        <button class="copy-btn" data-target="room-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                            </svg>
+                            <span class="copy-tooltip">Copy to clipboard</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Invitation Note -->
+                <div class="section">
+                    <label>Invitation Note</label>
+                    <div class="note-box">
+                        Hey!<br><br>
+                        Join our Secret Nick and make this holiday season magical! 🎄<br>
+                        You'll get to surprise someone with a gift — and receive one too. 🎁✨<br><br>
+                        🔗 Join here:<br>
+                        https://secretnickswap.com/join/abc123
+                    </div>
+                </div>
+                <!-- Personal Participant Link -->
+                <div class="section">
+                    <label>Your Personal Participant Link</label>
+                    <p style="margin: 4px 0 8px; color:#777; font-size:14px;">
+                        This is your unique personal link to access the Secret Nick room.
+                    </p>
+                    <div class="copy-input-wrapper">
+                        <input type="text" class="input" id="personal-link" value="https://secretnickswap.com/join/yourlink456" readonly>
+                        <button class="copy-btn" data-target="personal-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                            </svg>
+                            <span class="copy-tooltip">Copy to clipboard</span>
+                        </button>
+                    </div>
+                    <p style="margin-top:6px; color:#c12727; font-size:14px;">Do not share this link with other users</p>
+                </div>
+                <button class="button" id="visit-room-btn">Visit Your Room</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- PARTICIPANT PAGE -->
+    <section class="participant-page" id="participant-page">
+        <!-- Decorations for participant page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="app-flake app-f1">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(1).png" class="app-flake app-f2">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(2).png" class="app-flake app-f3">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(3).png" class="app-flake app-f4">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework.png" class="app-fw app-fw1">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework%20(1).png" class="app-fw app-fw2">
+        <!-- New presents image for participant page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="app-presents-img">
+        <!-- New present image for participant page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/present.png" class="app-present-img">
+        <!-- New snowglobe image for participant page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowglobe.png" class="app-snowglobe-img">
+        <!-- MAIN CONTENT -->
+        <div class="participant-container">
+            <!-- LEFT SIDE -->
+            <div class="participant-left">
+                <!-- Secret Squad Card -->
+                <div class="squad-card">
+                    <!-- Ball decoration in top right corner -->
+                    <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Ball%20Decor.png" class="squad-ball-decoration">
+                    <h2>Secret Squad</h2>
+                    <p class="squad-desc">
+                        Hey everyone!<br>
+                        Welcome to our Secret Nick gift exchange! Check the wishlist, see who's playing, and get ready for some holiday magic. Let's make this a festive and fun surprise!
+                    </p>
+                    <div class="info-boxes">
+                        <div class="info-box">
+                            <div class="info-title">
+                                <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="info-title-icon">
+                                Exchange Date
+                            </div>
+                            <span id="participant-exchange-date">06 Dec 2025</span>
+                        </div>
+                        <div class="info-box">
+                            <div class="info-title">
+                                <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="info-title-icon">
+                                Gift Budget
+                            </div>
+                            <span id="participant-gift-budget">1000 UAH</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Who's Playing -->
+                <div class="participant-card players-card">
+                    <!-- Vector decoration in top right corner -->
+                    <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Vector.png" class="players-vector-decoration">
+                    <h2>Who's Playing? <span style="color:#555; font-size:16px;" id="players-count">10/20</span></h2>
+                    <div class="player-row" data-player="Anastasiia Petrenko">
+                        Anastasiia Petrenko
+                        <button class="delete-btn admin-only" style="display: none;">Delete</button>
+                    </div>
+                    <div class="player-row" data-player="Kostiantyna Nechyporenko">
+                        Kostiantyna Nechyporenko
+                        <button class="delete-btn admin-only" style="display: none;">Delete</button>
+                    </div>
+                    <div class="player-row" id="current-user-row" data-player="Maria Shevchenko">
+                        Maria Shevchenko <span class="you-label">You</span>
+                    </div>
+                    <div class="player-row" data-player="Mykyta Slivchuk">
+                        Mykyta Slivchuk
+                        <button class="delete-btn admin-only" style="display: none;">Delete</button>
+                    </div>
+                    <div class="player-row" data-player="Kateryna Moravska">
+                        Kateryna Moravska
+                        <button class="delete-btn admin-only" style="display: none;">Delete</button>
+                    </div>
+                    <div class="player-row" data-player="Ivan Moldvinenko">
+                        Ivan Moldvinenko
+                        <button class="delete-btn admin-only" style="display: none;">Delete</button>
+                    </div>
+                    <div class="player-row" data-player="Serhii Kovalenko">
+                        Serhii Kovalenko
+                        <button class="delete-btn admin-only" style="display: none;">Delete</button>
+                    </div>
+                    <div class="player-row" data-player="Valeria Solominka">
+                        Valeria Solominka
+                        <button class="delete-btn admin-only" style="display: none;">Delete</button>
+                    </div>
+                    <div class="player-row" data-player="Veronica Andriyenko">
+                        Veronica Andriyenko
+                        <button class="delete-btn admin-only" style="display: none;">Delete</button>
+                    </div>
+                    <div class="player-row" data-player="Ivan Kolodii">
+                        Ivan Kolodii
+                        <button class="delete-btn admin-only" style="display: none;">Delete</button>
+                    </div>
+                </div>
+            </div>
+            <!-- RIGHT SIDE -->
+            <div class="participant-right">
+                <!-- Participant card -->
+                <div class="participant-info-card">
+                    <!-- Decoration in top right corner of red rectangle -->
+                    <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(1).png" class="participant-info-decoration">
+                    <h3>Hi, <span id="participant-name">Maria</span></h3>
+                    <p>Get ready for happy gift exchange and fun in Secret Nick game!</p>
+                    <p>Your Participant Link</p>
+                    <input type="text" id="participant-personal-link" value="https://secretnickswap.com/join/yourlink456" readonly />
+                    <div class="small-text">Do not share this link with other users</div>
+                    <button class="button-outline" id="view-info-btn">View Information</button>
+                </div>
+                <!-- Look Who You Got Card -->
+                <div class="look-who-card" id="look-who-card">
+                    <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/S.Nick.png" alt="Santa" class="look-who-santa-img">
+                    <div class="look-who-top-bg"></div>
+                    <h1>Look Who You Got!</h1>
+                    <p class="look-who-subtitle">You are a Secret Nick to</p>
+                    <div class="look-who-name" id="look-who-name">Anastasiia Petrenko</div>
+                    <button class="look-who-btn" id="look-who-btn">Read Details</button>
+                </div>
+                <!-- Draw Names Card (Admin only) -->
+                <div class="draw-names-card" id="draw-names-card">
+                    <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/Gifts.png" alt="Gifts" class="draw-names-img">
+                    <div class="draw-names-top-bg"></div>
+                    <h1>Let the Magic Begin!</h1>
+                    <div class="draw-names-description">Don't forget to hit the button to<br>randomly pair everyone in the game.</div>
+                    <button class="draw-names-btn" id="draw-names-btn">Draw Names</button>
+                </div>
+                <!-- Wishlist -->
+                <div class="participant-card wishlist-card">
+                    <h2>
+                        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowflake.png" class="wishlist-snowflake wishlist-snowflake-left">
+                        My Wishlist
+                        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowflake.png" class="wishlist-snowflake wishlist-snowflake-right">
+                    </h2>
+                    <div id="participant-wishlist-container">
+                        <!-- Wishlist items will be dynamically added here -->
+                    </div>
+                    <button class="button-green" id="view-wishlist-btn">View Wishlist</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WISHLIST PAGE -->
+    <section class="wishlist-page" id="wishlist-page">
+        <!-- Decorations for wishlist page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="app-flake app-f1">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(1).png" class="app-flake app-f2">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(2).png" class="app-flake app-f3">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(3).png" class="app-flake app-f4">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework.png" class="app-fw app-fw1">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework%20(1).png" class="app-fw app-fw2">
+        <!-- New presents image for wishlist page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="app-presents-img">
+        <!-- New present image for wishlist page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/present.png" class="app-present-img">
+        <!-- New snowglobe image for wishlist page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowglobe.png" class="app-snowglobe-img">
+        <div class="wishlist-container">
+            <!-- Decoration image in top left corner for wishlist page -->
+            <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="wishlist-decoration">
+            <h1>
+                <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowflake.png" class="wishlist-snowflake wishlist-snowflake-left">
+                My Wishlist
+                <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowflake.png" class="wishlist-snowflake wishlist-snowflake-right">
+            </h1>
+            <div class="wishlist-items" id="wishlist-page-items">
+                <!-- Wishlist items will be dynamically added here -->
+            </div>
+            <button class="back-button" id="back-to-participant-btn">Back to Room</button>
+        </div>
+    </section>
+
+    <!-- PERSONAL INFO PAGE -->
+    <section class="personal-info-page" id="personal-info-page">
+        <!-- Decorations for personal info page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="app-flake app-f1">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(1).png" class="app-flake app-f2">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(2).png" class="app-flake app-f3">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(3).png" class="app-flake app-f4">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework.png" class="app-fw app-fw1">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework%20(1).png" class="app-fw app-fw2">
+        <!-- New presents image for personal info page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="app-presents-img">
+        <!-- New present image for personal info page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/present.png" class="app-present-img">
+        <!-- New snowglobe image for personal info page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowglobe.png" class="app-snowglobe-img">
+        <div class="personal-info-container">
+            <!-- Decoration image in top left corner for personal info page -->
+            <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/car.png" class="personal-info-decoration">
+            <div class="close-btn" id="close-info-btn">✕</div>
+            <!-- Текст "Personal Information" переміщений після зображення -->
+            <h1>Personal Information</h1>
+            <p class="personal-info-subtitle">Secret Nick needs to know where to send your present!</p>
+            <div class="info-box">
+                <div class="grid">
+                    <!-- Перший стовбчик переміщений ближче до лівого краю -->
+                    <div style="margin-right: 20px;">
+                        <div class="label">First name</div>
+                        <div class="value" id="info-first-name">Anastasiia</div>
+                    </div>
+                    <div>
+                        <div class="label">Last name</div>
+                        <div class="value" id="info-last-name">Petrenko</div>
+                    </div>
+                    <div style="margin-right: 20px;">
+                        <div class="label">Phone number</div>
+                        <div class="value" id="info-phone">+38 099 876 54 32</div>
+                    </div>
+                    <div>
+                        <div class="label">Email</div>
+                        <div class="value" id="info-email">anastasiiapetrenko@gmail.com</div>
+                    </div>
+                    <div style="grid-column: 1 / 3;">
+                        <div class="label">Delivery address</div>
+                        <div class="value" id="info-address">Kyiv, NP #212</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LOOK WHO YOU GOT PAGE -->
+    <section class="look-who-page" id="look-who-page">
+        <!-- Decorations for look who page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat.png" class="app-flake app-f1">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(1).png" class="app-flake app-f2">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(2).png" class="app-flake app-f3">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/flat%20(3).png" class="app-flake app-f4">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework.png" class="app-fw app-fw1">
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/firework%20(1).png" class="app-fw app-fw2">
+        <!-- New presents image for look who page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/presents.png" class="app-presents-img">
+        <!-- New present image for look who page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/present.png" class="app-present-img">
+        <!-- New snowglobe image for look who page -->
+        <img src="https://raw.githubusercontent.com/KarinaR-Ch/MarathonEpam/refs/heads/main/src/loading%20page/snowglobe.png" class="app-snowglobe-img">
+        <div class="look-who-header">
+            Look Who You Got!
+        </div>
+        <div class="look-who-container">
+            <div class="look-who-grid">
+                <!-- PERSONAL INFORMATION -->
+                <div>
+                    <h2>Personal Information</h2>
+                    <div class="look-who-card-styled">
+                        <div class="snowflakes">❄️❄️</div>
+                        <div class="field-title">First name</div>
+                        <div class="field-value" id="look-who-first-name">Anastasiia</div>
+                        <div class="field-title">Last name</div>
+                        <div class="field-value" id="look-who-last-name">Petrenko</div>
+                        <div class="field-title">Phone number</div>
+                        <div class="field-value" id="look-who-phone">+38 099 876 54 32</div>
+                        <div class="field-title">Email</div>
+                        <div class="field-value" id="look-who-email">mariashevchenko@gmail.com</div>
+                        <div class="field-title">Delivery address</div>
+                        <div class="field-value" id="look-who-address">Kyiv, NP #212</div>
+                    </div>
+                </div>
+                <!-- WISHLIST */ -->
+                <div>
+                    <h2>Wishlist</h2>
+                    <div class="wish-item-styled">
+                        <span>Candies</span>
+                        <a href="https://himopt.com.ua/ua/shokoladnie-konfeti-ferrero-rocher-16-shtuk-200-g.html" target="_blank" class="link">Link</a>
+                    </div>
+                    <div class="wish-item-styled">
+                        <span>Christmass Candle</span>
+                    </div>
+                    <div class="wish-item-styled">
+                        <span>Harry Potter books</span>
+                        <a href="https://www.britishbook.ua/detail/harry-potter-and-the-philosopher-s-stone_3/?gad_source=4&gad_campaignid=20286857922&gbraid=0AAAAApy32kXaVIiMyvc0suCTWI0niNU7e&gclid=CjwKCAiAz_DIBhBJEiwAVH2XwEFA1_aSvs5EpDIW9r3R-szJSS2F1-PBlA367RkgqUxIJotBsUSOGxoCP1MQAvD_BwE" target="_blank" class="link">Link</a>
+                    </div>
+                    <div class="wish-item-styled">
+                        <span>Chocolate Bar</span>
+                    </div>
+                    <div class="wish-item-styled">
+                        <span>Puppy with little brown eyes and funny tail</span>
+                        <a href="https://antoshka.ua/uk/pesik-chi-chi-love-pi-pi-pappi-5893460.html" target="_blank" class="link">Link</a>
+                    </div>
+                </div>
+            </div>
+            <button class="btn" id="back-to-participant-from-look-who">Go Back to Room</button>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="main-footer">
+        <div class="footer-left">© 2025 EPAM Systems. All rights reserved.</div>
+        <div class="footer-right">Privacy Policy Privacy Notice</div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
 </html>
